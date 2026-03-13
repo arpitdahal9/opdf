@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-background text-ink antialiased transition-colors duration-200 dark:bg-darkbg dark:text-darkink;
+}
+
+* {
+  @apply border-border;
+}
+
+.app-shell {
+  @apply min-h-screen bg-white dark:bg-darkbg;
+}
+
+.page-wrap {
+  @apply mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8;
+}
+
+.card-surface {
+  @apply rounded-2xl border border-border bg-surface shadow-sm dark:border-slate-700 dark:bg-darksurface;
+}
+
+.primary-button {
+  @apply inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.secondary-button {
+  @apply inline-flex min-h-11 items-center justify-center rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-ink transition-all duration-200 hover:border-primary hover:text-primary dark:border-slate-700 dark:bg-slate-900 dark:text-darkink;
+}
+
+.field-input {
+  @apply min-h-11 w-full rounded-lg border border-border bg-white px-4 py-3 text-sm text-ink outline-none transition-all duration-200 placeholder:text-ink-muted focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-900 dark:text-darkink dark:placeholder:text-slate-400;
+}
