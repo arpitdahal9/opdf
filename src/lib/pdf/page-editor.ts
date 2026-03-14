@@ -1,6 +1,6 @@
 import { PDFDocument, degrees } from "pdf-lib";
 
-import { getFriendlyPdfError } from "@/lib/utils";
+import { getFriendlyPdfError, randomUUID } from "@/lib/utils";
 import type { PdfDocumentState, PdfPageItem, UploadedPdfFile } from "@/types/pdf";
 
 export function normalizeRotation(value: number) {
@@ -10,7 +10,7 @@ export function normalizeRotation(value: number) {
 export function createPageItemsFromDocuments(documents: Array<PdfDocumentState | UploadedPdfFile>) {
   return documents.flatMap((document) =>
     Array.from({ length: document.pageCount }, (_, pageIndex) => ({
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       sourceFileId: document.id,
       sourceFileName: document.name,
       sourceBaseName: document.baseName,

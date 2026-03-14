@@ -16,7 +16,7 @@ import { useState } from "react";
 import { FileDropzone } from "@/components/shared/FileDropzone";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import { imagesToPdf } from "@/lib/pdf/imageToPdf";
-import { downloadPDF, fileToUint8Array, formatFileSize, getFriendlyPdfError } from "@/lib/utils";
+import { downloadPDF, fileToUint8Array, formatFileSize, getFriendlyPdfError, randomUUID } from "@/lib/utils";
 
 type ImageItem = {
   id: string;
@@ -95,7 +95,7 @@ export function ImageToPdfWorkspace() {
         const previewUrl = URL.createObjectURL(file);
 
         nextItems.push({
-          id: crypto.randomUUID(),
+          id: randomUUID(),
           file,
           name: file.name,
           size: file.size,

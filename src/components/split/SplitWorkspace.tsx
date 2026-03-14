@@ -24,7 +24,7 @@ import {
   updatePageItemRotation,
 } from "@/lib/pdf/page-editor";
 import { splitEditedPages } from "@/lib/pdf/split";
-import { buildPageFilename, downloadPDF, getFriendlyPdfError, loadPdfFile, parsePageRange } from "@/lib/utils";
+import { buildPageFilename, downloadPDF, getFriendlyPdfError, loadPdfFile, parsePageRange, randomUUID } from "@/lib/utils";
 import type { PdfDocumentState, PdfPageItem } from "@/types/pdf";
 
 function SortableSplitPage({
@@ -135,7 +135,7 @@ export function SplitWorkspace() {
       setDocument(nextDocument);
       setPageItems(
         Array.from({ length: nextDocument.pageCount }, (_, index) => ({
-          id: crypto.randomUUID(),
+          id: randomUUID(),
           sourceFileId: nextDocument.id,
           sourceFileName: nextDocument.name,
           sourceBaseName: nextDocument.baseName,

@@ -4,7 +4,7 @@ export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://pleasefixmypdf.com";
-  const routes = ["", "/merge", "/split", "/rotate", "/reorder"];
+  const routes = ["", "/about", "/merge", "/split", "/rotate", "/reorder"];
 
   return routes.map((route) => ({
     url: `${baseUrl}${route}`,

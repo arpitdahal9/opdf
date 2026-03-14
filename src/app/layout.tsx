@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Cormorant_Garamond, Inter } from "next/font/google";
 
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
@@ -7,6 +7,13 @@ import { Navbar } from "@/components/layout/Navbar";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+// High-contrast elegant serif, similar to Zefani / Didone style
+const displaySerif = Cormorant_Garamond({
+  weight: ["400", "600"],
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pleasefixmypdf.com"),
@@ -35,7 +42,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.className} ${displaySerif.variable}`}>
         <div className="app-shell flex min-h-screen flex-col bg-background">
           <Navbar />
           <main className="flex-1">{children}</main>

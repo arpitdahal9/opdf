@@ -128,8 +128,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* All in One Tools checklist & feature list (below tools) */}
-      <section className="card-surface mx-auto max-w-4xl space-y-6 p-6" aria-label="All in one tool">
+      {/* All in one + Privacy + Benefits in one frame */}
+      <section className="card-surface mx-auto max-w-6xl space-y-8 p-6 sm:p-8" aria-label="All in one tool and benefits">
+        {/* All in one tool */}
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           <div className="shrink-0">
             <Image
@@ -163,50 +164,50 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Privacy CTA */}
-      <section className="card-surface mx-auto flex max-w-4xl flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Lock className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-              Private by design
-            </h2>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              Every PDF is processed in your browser. Nothing is uploaded or stored.
-            </p>
-          </div>
-        </div>
-        <Link href="/merge" className="primary-button shrink-0">
-          Get started
-        </Link>
-      </section>
-
-      {/* Feature strip at bottom */}
-      <section className="grid gap-4 md:grid-cols-3">
-        {featureCards.map((feature, index) => {
-          const Icon = feature.icon;
-          return (
-            <div
-              key={feature.title}
-              className="card-surface flex flex-col gap-2 px-5 py-5"
-              style={{
-                animation: `fadeInUp 0.6s ease-out ${index * 80}ms both`,
-              }}
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Icon className="h-4 w-4" />
-              </div>
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-                {feature.title}
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{feature.description}</p>
+        {/* Privacy CTA */}
+        <div className="flex flex-col gap-4 rounded-lg border border-border bg-muted/30 p-4 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Lock className="h-5 w-5" />
             </div>
-          );
-        })}
+            <div>
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                Private by design
+              </h2>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Every PDF is processed in your browser. Nothing is uploaded or stored.
+              </p>
+            </div>
+          </div>
+          <Link href="/merge" className="primary-button shrink-0">
+            Get started
+          </Link>
+        </div>
+
+        {/* Feature strip */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {featureCards.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <div
+                key={feature.title}
+                className="flex flex-col gap-2 rounded-lg border border-border bg-muted/20 px-5 py-5 dark:border-gray-700"
+                style={{
+                  animation: `fadeInUp 0.6s ease-out ${index * 80}ms both`,
+                }}
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {feature.title}
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{feature.description}</p>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       <style>{`
