@@ -12,14 +12,14 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Move } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { DownloadButton } from "@/components/shared/DownloadButton";
 import { FileDropzone } from "@/components/shared/FileDropzone";
 import { PageThumbnail } from "@/components/shared/PageThumbnail";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import { reorderPDF } from "@/lib/pdf/reorder";
-import { buildPageFilename, getFriendlyPdfError, loadPdfFile } from "@/lib/utils";
+import { buildPageFilename, downloadPDF, getFriendlyPdfError, loadPdfFile } from "@/lib/utils";
 import type { PdfDocumentState } from "@/types/pdf";
 
 function SortablePage({
@@ -40,15 +40,23 @@ function SortablePage({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={isDragging ? "opacity-50" : undefined}
-      {...attributes}
-      {...listeners}
     >
       <PageThumbnail
         pdfBytes={pdfBytes}
         pageIndex={pageIndex}
         label={`Position ${position}`}
         className="touch-none"
-      />
+      >
+        <button
+          type="button"
+          className="secondary-button min-h-10 px-3"
+          aria-label={`Move page ${position}`}
+          {...attributes}
+          {...listeners}
+        >
+          <Move className="h-4 w-4" />
+        </button>
+      </PageThumbnail>
     </div>
   );
 }
@@ -58,7 +66,6 @@ export function ReorderWorkspace() {
   const [document, setDocument] = useState<PdfDocumentState | null>(null);
   const [order, setOrder] = useState<number[]>([]);
   const [activePage, setActivePage] = useState<number | null>(null);
-  const [result, setResult] = useState<Uint8Array | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,7 +76,6 @@ export function ReorderWorkspace() {
       const nextDocument = await loadPdfFile(files[0]);
       setDocument(nextDocument);
       setOrder(Array.from({ length: nextDocument.pageCount }, (_, index) => index));
-      setResult(null);
       setError(null);
     } catch (err) {
       setError(getFriendlyPdfError(err));
@@ -92,7 +98,6 @@ export function ReorderWorkspace() {
       const newIndex = current.indexOf(Number(over.id));
       return arrayMove(current, oldIndex, newIndex);
     });
-    setResult(null);
   };
 
   const saveOrder = async () => {
@@ -101,7 +106,7 @@ export function ReorderWorkspace() {
     setError(null);
     try {
       const output = await reorderPDF(document.bytes, order);
-      setResult(output);
+      downloadPDF(output, buildPageFilename(document.baseName, "reordered"));
     } catch (err) {
       setError(getFriendlyPdfError(err));
     } finally {
@@ -134,7 +139,6 @@ export function ReorderWorkspace() {
             onClick={() => {
               setDocument(null);
               setOrder([]);
-              setResult(null);
               setError(null);
             }}
           >
@@ -165,7 +169,6 @@ export function ReorderWorkspace() {
                 disabled={!hasChanges}
                 onClick={() => {
                   setOrder(Array.from({ length: document.pageCount }, (_, index) => index));
-                  setResult(null);
                 }}
               >
                 Reset Order
@@ -205,7 +208,7 @@ export function ReorderWorkspace() {
                   pdfBytes={document.bytes}
                   pageIndex={activePage}
                   label={`Position ${order.indexOf(activePage) + 1}`}
-                  className="shadow-card"
+                  className="shadow-md"
                 />
               ) : null}
             </DragOverlay>
@@ -214,21 +217,6 @@ export function ReorderWorkspace() {
       ) : null}
 
       {processing ? <ProcessingSpinner label="Saving new page order..." /> : null}
-
-      {result && document ? (
-        <div className="card-surface flex flex-wrap items-center justify-between gap-4 p-5">
-          <div>
-            <h2 className="font-semibold">Reordered PDF ready</h2>
-            <p className="text-sm text-ink-muted dark:text-slate-300">
-              Your pages have been rearranged and are ready to download.
-            </p>
-          </div>
-          <DownloadButton
-            pdfBytes={result}
-            filename={buildPageFilename(document.baseName, "reordered")}
-          />
-        </div>
-      ) : null}
     </div>
   );
 }

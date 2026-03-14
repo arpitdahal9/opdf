@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://pdfkit-app.vercel.app";
+  const baseUrl = "https://pleasefixmypdf.com";
 
   return {
     rules: {

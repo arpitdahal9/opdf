@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Combine multiple PDF files into one document instantly. 100% browser-based, and your files never leave your device.",
   alternates: { canonical: "/merge" },
   openGraph: {
-    title: "Merge PDF Files Online ? Free, Private, No Upload | PDFKit",
+    title: "Merge PDF Files Online ? Free, Private, No Upload | PleaseFixMyPDF.com",
     description:
       "Combine multiple PDF files into one document instantly. 100% browser-based, and your files never leave your device.",
     url: "/merge",

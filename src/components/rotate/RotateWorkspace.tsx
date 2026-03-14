@@ -3,12 +3,11 @@
 import { RotateCcw, RotateCw } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { DownloadButton } from "@/components/shared/DownloadButton";
 import { FileDropzone } from "@/components/shared/FileDropzone";
 import { PageThumbnail } from "@/components/shared/PageThumbnail";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import { rotatePDF } from "@/lib/pdf/rotate";
-import { buildPageFilename, getFriendlyPdfError, loadPdfFile } from "@/lib/utils";
+import { buildPageFilename, downloadPDF, getFriendlyPdfError, loadPdfFile } from "@/lib/utils";
 import type { PdfDocumentState } from "@/types/pdf";
 
 function normalizeRotation(value: number) {
@@ -18,7 +17,6 @@ function normalizeRotation(value: number) {
 export function RotateWorkspace() {
   const [document, setDocument] = useState<PdfDocumentState | null>(null);
   const [rotations, setRotations] = useState<Map<number, number>>(new Map());
-  const [result, setResult] = useState<Uint8Array | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +38,6 @@ export function RotateWorkspace() {
       }
       return next;
     });
-    setResult(null);
   };
 
   const rotateAll = (delta: number) => {
@@ -55,7 +52,6 @@ export function RotateWorkspace() {
       }
       return next;
     });
-    setResult(null);
   };
 
   const handleFile = async (files: File[]) => {
@@ -63,7 +59,6 @@ export function RotateWorkspace() {
       const nextDocument = await loadPdfFile(files[0]);
       setDocument(nextDocument);
       setRotations(new Map());
-      setResult(null);
       setError(null);
     } catch (err) {
       setError(getFriendlyPdfError(err));
@@ -79,7 +74,7 @@ export function RotateWorkspace() {
     setError(null);
     try {
       const output = await rotatePDF(document.bytes, rotations);
-      setResult(output);
+      downloadPDF(output, buildPageFilename(document.baseName, "rotated"));
     } catch (err) {
       setError(getFriendlyPdfError(err));
     } finally {
@@ -93,6 +88,9 @@ export function RotateWorkspace() {
         <h1 className="text-3xl font-bold">Rotate PDF pages</h1>
         <p className="max-w-2xl text-ink-muted dark:text-slate-300">
           Rotate any page left or right with an instant preview, or apply the same turn to the entire document.
+        </p>
+        <p className="text-sm text-ink-muted dark:text-slate-400">
+          All in one: rotate individual pages or the whole document in one go.
         </p>
       </section>
 
@@ -112,7 +110,6 @@ export function RotateWorkspace() {
             onClick={() => {
               setDocument(null);
               setRotations(new Map());
-              setResult(null);
               setError(null);
             }}
           >
@@ -148,7 +145,6 @@ export function RotateWorkspace() {
                 className="secondary-button"
                 onClick={() => {
                   setRotations(new Map());
-                  setResult(null);
                 }}
                 disabled={!hasChanges}
               >
@@ -200,18 +196,6 @@ export function RotateWorkspace() {
       ) : null}
 
       {processing ? <ProcessingSpinner label="Applying page rotations..." /> : null}
-
-      {result && document ? (
-        <div className="card-surface flex flex-wrap items-center justify-between gap-4 p-5">
-          <div>
-            <h2 className="font-semibold">Rotated PDF ready</h2>
-            <p className="text-sm text-ink-muted dark:text-slate-300">
-              Your updated document has been rotated in the browser.
-            </p>
-          </div>
-          <DownloadButton pdfBytes={result} filename={buildPageFilename(document.baseName, "rotated")} />
-        </div>
-      ) : null}
     </div>
   );
 }

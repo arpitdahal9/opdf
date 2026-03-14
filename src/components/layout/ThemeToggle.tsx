@@ -19,7 +19,7 @@ function getSnapshot() {
   }
 
   const stored = window.localStorage.getItem("pdfkit-theme");
-  return stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  return stored === "dark";
 }
 
 export function ThemeToggle() {

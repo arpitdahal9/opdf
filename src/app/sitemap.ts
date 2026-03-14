@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://pdfkit-app.vercel.app";
+  const baseUrl = "https://pleasefixmypdf.com";
   const routes = ["", "/merge", "/split", "/rotate", "/reorder"];
 
   return routes.map((route) => ({

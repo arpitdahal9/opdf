@@ -24,12 +24,6 @@ export function useFileUpload({
     }
 
     const normalizedFiles = multiple ? incomingFiles : incomingFiles.slice(0, 1);
-    const invalidType = normalizedFiles.find((file) => file.type !== "application/pdf");
-
-    if (invalidType) {
-      throw new Error("Only PDF files are supported.");
-    }
-
     const oversized = normalizedFiles.find((file) => file.size > maxSizeBytes);
     if (oversized) {
       throw new Error(`${oversized.name} exceeds the ${maxSizeMB} MB size limit.`);

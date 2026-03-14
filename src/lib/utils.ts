@@ -46,13 +46,33 @@ export function getBaseName(filename: string) {
 }
 
 export function getFriendlyPdfError(error: unknown) {
-  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  const message = error instanceof Error ? error.message : "";
+  const lower = message.toLowerCase();
 
-  if (message.includes("password") || message.includes("encrypted")) {
+  if (lower.includes("password") || lower.includes("encrypted")) {
     return PDF_PROCESSING_ERROR_MESSAGE;
   }
 
+  // For non-password issues, surface the original error if we have one.
+  if (message) {
+    return message;
+  }
+
   return PDF_PROCESSING_ERROR_MESSAGE;
+}
+
+export function downloadBytes(bytes: Uint8Array, filename: string, mimeType: string) {
+  const arrayBuffer = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
+  const blob = new Blob([arrayBuffer], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
 }
 
 export async function loadPdfFile(file: File): Promise<PdfDocumentState> {
@@ -60,6 +80,7 @@ export async function loadPdfFile(file: File): Promise<PdfDocumentState> {
     const bytes = await fileToUint8Array(file);
     const pdf = await PDFDocument.load(bytes);
     return {
+      id: crypto.randomUUID(),
       file,
       name: file.name,
       size: file.size,

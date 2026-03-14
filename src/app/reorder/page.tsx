@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Rearrange PDF pages with drag and drop in your browser, then download the new order instantly.",
   alternates: { canonical: "/reorder" },
   openGraph: {
-    title: "Reorder PDF Pages Online ? Free, Private, No Upload | PDFKit",
+    title: "Reorder PDF Pages Online ? Free, Private, No Upload | PleaseFixMyPDF.com",
     description:
       "Rearrange PDF pages with drag and drop in your browser, then download the new order instantly.",
     url: "/reorder",

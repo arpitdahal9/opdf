@@ -67,14 +67,14 @@ export function PageThumbnail({
           }
         }}
         className={cn(
-          "group relative overflow-hidden rounded-xl border bg-white shadow-sm transition-all duration-200 dark:bg-slate-900",
-          onClick && "cursor-pointer hover:-translate-y-1 hover:shadow-card",
+          "group relative overflow-hidden rounded-lg border border-border bg-white shadow-sm transition-shadow",
+          onClick && "cursor-pointer hover:shadow-md",
           selected
-            ? "border-primary bg-primary-soft/70 ring-2 ring-primary/20 dark:bg-primary/10"
-            : "border-border dark:border-slate-700",
+            ? "border-primary ring-2 ring-primary/20"
+            : undefined,
         )}
       >
-        <div className="relative flex min-h-[320px] items-center justify-center overflow-hidden bg-slate-100 p-4 dark:bg-slate-950/70">
+        <div className="relative flex min-h-[320px] items-center justify-center overflow-hidden bg-gray-100 dark:bg-[#0d132a] p-4">
           {thumbnailUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -86,11 +86,11 @@ export function PageThumbnail({
           ) : error ? (
             <div className="px-4 text-center text-xs text-danger">{error}</div>
           ) : (
-            <div className="h-[290px] w-full animate-pulse rounded-lg bg-slate-200 dark:bg-slate-800" />
+            <div className="h-[290px] w-full animate-pulse rounded-lg bg-gray-200 dark:bg-white/10" />
           )}
 
           {selected ? (
-            <div className="absolute right-2 top-2 rounded-full bg-white text-primary shadow dark:bg-slate-900">
+            <div className="absolute right-2 top-2 rounded-full bg-white text-primary shadow">
               <CheckCircle2 className="h-5 w-5" />
             </div>
           ) : null}

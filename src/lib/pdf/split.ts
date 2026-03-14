@@ -1,6 +1,8 @@
 import { PDFDocument } from "pdf-lib";
 
+import { buildPdfFromPageItems } from "@/lib/pdf/page-editor";
 import { getFriendlyPdfError } from "@/lib/utils";
+import type { PdfPageItem } from "@/types/pdf";
 
 export async function splitPDF(
   pdfBytes: Uint8Array,
@@ -15,4 +17,8 @@ export async function splitPDF(
   } catch (error) {
     throw new Error(getFriendlyPdfError(error));
   }
+}
+
+export async function splitEditedPages(pageItems: PdfPageItem[]) {
+  return buildPdfFromPageItems(pageItems);
 }

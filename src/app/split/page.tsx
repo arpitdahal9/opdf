@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Extract specific pages or split a PDF by custom ranges in your browser. Private, fast, and fully client-side.",
   alternates: { canonical: "/split" },
   openGraph: {
-    title: "Split PDF Pages Online ? Free, Private, No Upload | PDFKit",
+    title: "Split PDF Pages Online ? Free, Private, No Upload | PleaseFixMyPDF.com",
     description:
       "Extract specific pages or split a PDF by custom ranges in your browser. Private, fast, and fully client-side.",
     url: "/split",

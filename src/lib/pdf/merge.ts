@@ -1,6 +1,8 @@
 import { PDFDocument } from "pdf-lib";
 
+import { buildPdfFromPageItems } from "@/lib/pdf/page-editor";
 import { getFriendlyPdfError } from "@/lib/utils";
+import type { PdfPageItem } from "@/types/pdf";
 
 export async function mergePDFs(pdfBytesArray: Uint8Array[]): Promise<Uint8Array> {
   try {
@@ -14,4 +16,8 @@ export async function mergePDFs(pdfBytesArray: Uint8Array[]): Promise<Uint8Array
   } catch (error) {
     throw new Error(getFriendlyPdfError(error));
   }
+}
+
+export async function mergeEditedPages(pageItems: PdfPageItem[]) {
+  return buildPdfFromPageItems(pageItems);
 }
