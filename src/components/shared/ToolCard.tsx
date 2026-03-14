@@ -35,7 +35,7 @@ export function ToolCard({
   return (
     <Link
       href={href}
-      className={`card-surface group flex h-full flex-col gap-3 p-5 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${ringClass}`}
+      className={`card-surface group flex h-full flex-col gap-3 p-4 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:p-5 ${ringClass}`}
     >
       <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${iconClass}`}>
         <Icon className="h-5 w-5" />
