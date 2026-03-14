@@ -13,7 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
-const LOGO_URL = "https://files.catbox.moe/8buz43.png";
+const LOGO_URL = "/logo.png";
 
 import { ToolCard } from "@/components/shared/ToolCard";
 
@@ -139,7 +139,6 @@ export default function HomePage() {
               width={280}
               height={280}
               className="h-48 w-48 object-contain sm:h-64 sm:w-64 md:h-72 md:w-72"
-              unoptimized
             />
           </div>
           <div className="min-w-0 flex-1 space-y-4">

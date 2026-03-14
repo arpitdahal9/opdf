@@ -190,7 +190,7 @@ export function SplitWorkspace() {
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Split PDF pages</h1>
+        <h1 className="text-3xl font-bold">Split PDF Files Free</h1>
         <p className="max-w-2xl text-ink-muted dark:text-slate-300">
           Select pages, enter ranges, rotate pages, and reorder the final sequence freely before downloading the extracted PDF.
         </p>

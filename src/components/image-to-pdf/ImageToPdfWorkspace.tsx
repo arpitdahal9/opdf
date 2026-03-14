@@ -147,7 +147,7 @@ export function ImageToPdfWorkspace() {
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Image to PDF</h1>
+        <h1 className="text-3xl font-bold">Convert Images to PDF Free</h1>
         <p className="max-w-2xl text-gray-600 dark:text-slate-300">
           Turn multiple images into a single, clean PDF. Reorder pages and download instantly — all
           in your browser.

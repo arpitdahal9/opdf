@@ -61,7 +61,7 @@ export function CompressWorkspace() {
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Compress PDF</h1>
+        <h1 className="text-3xl font-bold">Compress PDF Free</h1>
         <p className="max-w-2xl text-ink-muted dark:text-slate-300">
           Reduce PDF file size without leaving your browser. Strip metadata and let pdf-lib compress the content.
         </p>

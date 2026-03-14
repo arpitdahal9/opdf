@@ -2,9 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About PleaseFixMyPDF",
+  title: "About PleaseFixMyPDF — Free PDF Tools Built with Love",
   description:
-    "A love story told in merged documents and rotated pages. Why we built free, private PDF tools.",
+    "The story behind PleaseFixMyPDF.com — free, private PDF tools built by a developer for his wife.",
+  alternates: { canonical: "https://pleasefixmypdf.com/about/" },
+  openGraph: {
+    title: "About PleaseFixMyPDF — Free PDF Tools Built with Love",
+    description:
+      "The story behind PleaseFixMyPDF.com — free, private PDF tools built by a developer for his wife.",
+    url: "https://pleasefixmypdf.com/about/",
+  },
 };
 
 export default function AboutPage() {

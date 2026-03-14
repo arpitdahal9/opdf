@@ -1,20 +1,34 @@
 import type { Metadata } from "next";
 
 import { RotateWorkspace } from "@/components/rotate/RotateWorkspace";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 export const metadata: Metadata = {
-  title: "Rotate PDF Pages Online ? Free, Private, No Upload",
+  title: "Rotate PDF Free Online — Rotate PDF Pages Instantly",
   description:
-    "Rotate individual or all PDF pages with instant previews right in your browser. No uploads required.",
-  alternates: { canonical: "/rotate" },
+    "Rotate PDF pages 90°, 180°, or 270°. Rotate one page or all pages. Free, no upload, works in your browser.",
+  alternates: { canonical: "https://pleasefixmypdf.com/rotate/" },
   openGraph: {
-    title: "Rotate PDF Pages Online ? Free, Private, No Upload | PleaseFixMyPDF.com",
+    title: "Rotate PDF Free Online — Rotate PDF Pages Instantly",
     description:
-      "Rotate individual or all PDF pages with instant previews right in your browser. No uploads required.",
-    url: "/rotate",
+      "Rotate PDF pages 90°, 180°, or 270°. Rotate one page or all pages. Free, no upload, works in your browser.",
+    url: "https://pleasefixmypdf.com/rotate/",
   },
 };
 
+const relatedTools = [
+  { href: "/reorder", label: "Reorder PDF" },
+  { href: "/split", label: "Split PDF" },
+  { href: "/merge", label: "Merge PDF" },
+];
+
 export default function RotatePage() {
-  return <RotateWorkspace />;
+  return (
+    <>
+      <RotateWorkspace />
+      <div className="page-wrap mx-auto max-w-4xl space-y-10 px-4 pb-12">
+        <RelatedTools tools={relatedTools} />
+      </div>
+    </>
+  );
 }

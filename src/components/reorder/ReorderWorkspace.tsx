@@ -117,7 +117,7 @@ export function ReorderWorkspace() {
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Reorder PDF pages</h1>
+        <h1 className="text-3xl font-bold">Reorder PDF Pages Free</h1>
         <p className="max-w-2xl text-ink-muted dark:text-slate-300">
           Drag pages into a new sequence, reset if needed, and download a reordered PDF when you are happy.
         </p>

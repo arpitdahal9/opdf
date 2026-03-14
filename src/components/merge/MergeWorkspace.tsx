@@ -182,7 +182,7 @@ export function MergeWorkspace() {
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-3">
-          <h1 className="text-3xl font-bold">Merge PDF files</h1>
+          <h1 className="text-3xl font-bold">Merge PDF Files Free</h1>
           <p className="max-w-2xl text-gray-600 dark:text-slate-300">
             Upload multiple PDFs, then rotate and reorder pages before downloading a single combined file. You can reorder when merging as well—drag pages into the order you want.
           </p>

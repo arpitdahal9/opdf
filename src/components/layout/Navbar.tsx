@@ -178,12 +178,11 @@ export function Navbar() {
         <Link href="/" className="flex shrink-0 items-center gap-2 min-w-0">
           <span className="relative flex h-12 w-12 shrink-0 items-center justify-center">
             <Image
-              src="https://files.catbox.moe/8buz43.png"
+              src="/logo.png"
               alt=""
               width={48}
               height={48}
               className="h-12 w-12 object-contain"
-              unoptimized
             />
           </span>
           <span className="hidden sm:inline font-display text-4xl font-bold tracking-tight truncate">
