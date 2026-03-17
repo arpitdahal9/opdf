@@ -74,6 +74,41 @@ const tools = [
     icon: Minimize2,
     accent: "red" as const,
   },
+  {
+    href: "/pdf-to-jpg",
+    title: "PDF to JPG",
+    description: "Turn each PDF page into a JPG image you can download.",
+    icon: ImageIcon,
+    accent: "blue" as const,
+  },
+  {
+    href: "/pdf-to-png",
+    title: "PDF to PNG",
+    description: "Convert PDF pages to crisp PNG images with transparency.",
+    icon: ImageIcon,
+    accent: "red" as const,
+  },
+  {
+    href: "/jpg-to-pdf",
+    title: "JPG to PDF",
+    description: "Turn one or many JPG images into a single PDF.",
+    icon: ImageIcon,
+    accent: "blue" as const,
+  },
+  {
+    href: "/png-to-pdf",
+    title: "PNG to PDF",
+    description: "Convert PNG images into an ordered PDF in your browser.",
+    icon: ImageIcon,
+    accent: "red" as const,
+  },
+  {
+    href: "/pdf-to-text",
+    title: "PDF to Text",
+    description: "Extract text from PDFs or turn text into a simple PDF.",
+    icon: FileText,
+    accent: "blue" as const,
+  },
 ];
 
 const featureCards = [
