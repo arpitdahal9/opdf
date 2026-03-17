@@ -16,9 +16,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { NavbarAuthDesktop } from "./NavbarAuth";
-import { NavbarAuthMobile } from "./NavbarAuth";
-
 const redLinkHrefs = new Set(["/split", "/reorder", "/pdf-to-word", "/compress"]);
 const blueLinkHrefs = new Set(["/merge", "/rotate", "/word-to-pdf", "/image-to-pdf"]);
 
@@ -235,7 +232,18 @@ export function Navbar() {
           >
             All tools
           </Link>
-          <NavbarAuthDesktop />
+          <Link
+            href="/login"
+            className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            Log in
+          </Link>
+          <Link
+            href="/signup"
+            className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-white bg-primary hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            Sign up
+          </Link>
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
@@ -330,7 +338,20 @@ export function Navbar() {
                 >
                   All tools
                 </Link>
-                <NavbarAuthMobile onClose={closeMobileMenu} />
+                <Link
+                  href="/login"
+                  onClick={closeMobileMenu}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={closeMobileMenu}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                  Sign up
+                </Link>
               </div>
             </nav>
           </div>
