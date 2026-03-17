@@ -12,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Move } from "lucide-react";
+import { Move, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
@@ -26,10 +26,14 @@ function SortablePage({
   pageIndex,
   position,
   pdfBytes,
+  canDelete,
+  onDelete,
 }: {
   pageIndex: number;
   position: number;
   pdfBytes: Uint8Array;
+  canDelete: boolean;
+  onDelete?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: pageIndex,
@@ -39,8 +43,21 @@ function SortablePage({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={isDragging ? "opacity-50" : undefined}
+      className={`relative ${isDragging ? "opacity-50" : ""}`}
     >
+      {canDelete && onDelete ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="absolute right-0 top-0 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white text-ink shadow-md transition hover:bg-danger hover:text-white hover:border-danger dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-danger dark:hover:text-white"
+          aria-label={`Remove page ${position}`}
+        >
+          <X className="h-4 w-4" />
+        </button>
+      ) : null}
       <PageThumbnail
         pdfBytes={pdfBytes}
         pageIndex={pageIndex}
@@ -114,10 +131,14 @@ export function ReorderWorkspace() {
     }
   };
 
+  const handleDeletePage = (indexToRemove: number) => {
+    setOrder((current) => current.filter((_, i) => i !== indexToRemove));
+  };
+
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Reorder PDF Pages Free</h1>
+        <h1 className="text-3xl font-bold">Reorder PDF Pages</h1>
         <p className="max-w-2xl text-ink-muted dark:text-slate-300">
           Drag pages into a new sequence, reset if needed, and download a reordered PDF when you are happy.
         </p>
@@ -198,6 +219,8 @@ export function ReorderWorkspace() {
                     pageIndex={pageIndex}
                     position={index + 1}
                     pdfBytes={document.bytes}
+                    canDelete={order.length > 1}
+                    onDelete={() => handleDeletePage(index)}
                   />
                 ))}
               </div>

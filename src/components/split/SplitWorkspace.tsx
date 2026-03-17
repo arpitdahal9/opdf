@@ -12,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Move, RotateCcw, RotateCw } from "lucide-react";
+import { Move, RotateCcw, RotateCw, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
@@ -32,15 +32,19 @@ function SortableSplitPage({
   position,
   selected,
   interactive,
+  canDelete,
   onToggle,
   onRotate,
+  onDelete,
 }: {
   item: PdfPageItem;
   position: number;
   selected: boolean;
   interactive: boolean;
+  canDelete: boolean;
   onToggle?: () => void;
   onRotate: (pageId: string, delta: number) => void;
+  onDelete?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
@@ -50,8 +54,21 @@ function SortableSplitPage({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={isDragging ? "opacity-50" : undefined}
+      className={`relative ${isDragging ? "opacity-50" : ""}`}
     >
+      {canDelete && onDelete ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="absolute right-0 top-0 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white text-ink shadow-md transition hover:bg-danger hover:text-white hover:border-danger dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-danger dark:hover:text-white"
+          aria-label={`Remove page ${position}`}
+        >
+          <X className="h-4 w-4" />
+        </button>
+      ) : null}
       <PageThumbnail
         pdfBytes={item.sourceBytes}
         pageIndex={item.sourcePageIndex}
@@ -187,10 +204,15 @@ export function SplitWorkspace() {
     });
   };
 
+  const handleDeletePage = (itemId: string) => {
+    setPageItems((current) => current.filter((item) => item.id !== itemId));
+    setSelectedPageIds((current) => current.filter((id) => id !== itemId));
+  };
+
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Split PDF Files Free</h1>
+        <h1 className="text-3xl font-bold">Split PDF Files</h1>
         <p className="max-w-2xl text-ink-muted dark:text-slate-300">
           Select pages, enter ranges, rotate pages, and reorder the final sequence freely before downloading the extracted PDF.
         </p>
@@ -352,6 +374,7 @@ export function SplitWorkspace() {
                     position={index + 1}
                     selected={activePageIds.includes(item.id)}
                     interactive={mode === "select"}
+                    canDelete={pageItems.length > 1}
                     onToggle={
                       mode === "select"
                         ? () =>
@@ -365,6 +388,7 @@ export function SplitWorkspace() {
                     onRotate={(pageId, delta) => {
                       setPageItems((current) => updatePageItemRotation(current, pageId, delta));
                     }}
+                    onDelete={() => handleDeletePage(item.id)}
                   />
                 ))}
               </div>
