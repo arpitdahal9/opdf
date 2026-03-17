@@ -5,16 +5,17 @@ import { useState } from "react";
 import { FileDropzone } from "@/components/shared/FileDropzone";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import { compressPdf, type CompressionLevel } from "@/lib/pdf/compressPdf";
-import { downloadPDF, formatFileSize, getFriendlyPdfError, fileToUint8Array } from "@/lib/utils";
+import { downloadPDF, formatFileSize, getFriendlyPdfError } from "@/lib/utils";
 
 export function CompressWorkspace() {
   const [file, setFile] = useState<File | null>(null);
   const [originalSize, setOriginalSize] = useState<number | null>(null);
   const [resultSize, setResultSize] = useState<number | null>(null);
-  const [compressionLevel, setCompressionLevel] = useState<CompressionLevel>("medium");
+  const [compressionLevel, setCompressionLevel] = useState<CompressionLevel>("high");
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [progress, setProgress] = useState<number | null>(null);
 
   const handleFilesSelected = (files: File[]) => {
     const nextFile = files[0];
@@ -22,6 +23,7 @@ export function CompressWorkspace() {
     setOriginalSize(nextFile.size);
     setResultSize(null);
     setNote(null);
+    setProgress(null);
     setError(null);
   };
 
@@ -31,23 +33,49 @@ export function CompressWorkspace() {
     setError(null);
     setResultSize(null);
     setNote(null);
+    setProgress(null);
 
     try {
-      if (file.size < 500 * 1024) {
-        setNote("This PDF is already small. Compression may not help much.");
-      }
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await compressPdf({
+        file: arrayBuffer,
+        level: compressionLevel,
+        onProgress: (current, total) => {
+          const percent = Math.round((current / total) * 100);
+          setProgress(percent);
+        },
+      });
 
-      const bytes = await fileToUint8Array(file);
-      const compressed = await compressPdf(bytes, compressionLevel);
-      setResultSize(compressed.byteLength);
-      const filename = file.name
-        ? file.name.replace(/\.pdf$/i, "") + "_compressed.pdf"
-        : "compressed.pdf";
-      downloadPDF(compressed, filename);
+      setOriginalSize(result.originalSize);
+
+      const shouldUseOriginal = result.compressedSize >= result.originalSize;
+
+      if (shouldUseOriginal) {
+        setResultSize(result.originalSize);
+        setNote(
+          "This PDF couldn't be reduced further. Text‑only or already optimised PDFs may not compress much, so you'll get the original file back.",
+        );
+
+        const originalBytes = new Uint8Array(arrayBuffer);
+        const filename = file.name || "original.pdf";
+        downloadPDF(originalBytes, filename);
+      } else {
+        setResultSize(result.compressedSize);
+
+        if (result.reductionPercent < 5) {
+          setNote("This PDF was already fairly small. Compression only helped a little.");
+        }
+
+        const filename = file.name
+          ? file.name.replace(/\.pdf$/i, "") + "_compressed.pdf"
+          : "compressed.pdf";
+        downloadPDF(result.data, filename);
+      }
     } catch (err) {
       setError(getFriendlyPdfError(err));
     } finally {
       setProcessing(false);
+      setProgress(null);
     }
   };
 
@@ -61,9 +89,9 @@ export function CompressWorkspace() {
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Compress PDF Free</h1>
+        <h1 className="text-3xl font-bold">Compress PDF</h1>
         <p className="max-w-2xl text-ink-muted dark:text-slate-300">
-          Reduce PDF file size without leaving your browser. Strip metadata and let pdf-lib compress the content.
+          Reduce PDF file size without leaving your browser. Pages are rendered and rebuilt so images can be heavily compressed while keeping things readable.
         </p>
       </section>
 
@@ -71,20 +99,19 @@ export function CompressWorkspace() {
         <div className="space-y-1">
           <p className="text-sm font-semibold text-white">Compression level</p>
           <p className="text-xs text-ink-muted">
-            Low keeps maximum quality. High may significantly reduce file size.
+            Medium keeps more detail. High is more aggressive and usually gives the smallest files.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {(["low", "medium", "high"] as CompressionLevel[]).map((level) => (
+          {(["medium", "high"] as CompressionLevel[]).map((level) => (
             <button
               key={level}
               type="button"
               className={compressionLevel === level ? "primary-button" : "secondary-button"}
               onClick={() => setCompressionLevel(level)}
             >
-              {level === "low" && "Low (10%)"}
-              {level === "medium" && "Medium (25%)"}
-              {level === "high" && "High (40%)"}
+              {level === "medium" && "Medium"}
+              {level === "high" && "High"}
             </button>
           ))}
         </div>
@@ -110,7 +137,11 @@ export function CompressWorkspace() {
         </div>
       ) : null}
 
-      {processing ? <ProcessingSpinner label="Compressing your PDF..." /> : null}
+      {processing ? (
+        <ProcessingSpinner
+          label={progress !== null ? `Compressing your PDF (${progress}%)...` : "Compressing your PDF..."}
+        />
+      ) : null}
 
       {beforeSize ? (
         <div className="glass-panel flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
