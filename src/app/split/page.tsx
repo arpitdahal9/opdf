@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 
 import { SplitWorkspace } from "@/components/split/SplitWorkspace";
+import { BreadcrumbSchema } from "@/components/shared/BreadcrumbSchema";
 import { FAQSection } from "@/components/shared/FAQSection";
 import { RelatedTools } from "@/components/shared/RelatedTools";
 
 export const metadata: Metadata = {
-  title: "Split PDF Free Online — Extract Pages from PDF",
+  title: "Split PDF Online — Extract Pages from PDF",
   description:
-    "Split PDF files and extract pages instantly. Select specific pages or use ranges. Free, private, in your browser.",
+    "Split PDF files and extract pages instantly. Select specific pages or use ranges. Private, in your browser.",
   alternates: { canonical: "https://pleasefixmypdf.com/split/" },
   openGraph: {
-    title: "Split PDF Free Online — Extract Pages from PDF",
+    title: "Split PDF Online — Extract Pages from PDF",
     description:
-      "Split PDF files and extract pages instantly. Select specific pages or use ranges. Free, private, in your browser.",
+      "Split PDF files and extract pages instantly. Select specific pages or use ranges. Private, in your browser.",
     url: "https://pleasefixmypdf.com/split/",
   },
 };
@@ -35,9 +36,15 @@ const relatedTools = [
   { href: "/reorder", label: "Reorder PDF" },
 ];
 
+const breadcrumbs = [
+  { name: "Home", url: "/" },
+  { name: "Split PDF", url: "/split" },
+];
+
 export default function SplitPage() {
   return (
     <>
+      <BreadcrumbSchema items={breadcrumbs} />
       <SplitWorkspace />
       <div className="page-wrap mx-auto max-w-4xl space-y-10 px-4 pb-12">
         <FAQSection items={splitFaq} />

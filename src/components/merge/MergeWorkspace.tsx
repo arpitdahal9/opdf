@@ -12,18 +12,26 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { FileText, LayoutGrid, List, Move, Plus, RotateCcw, RotateCw, Trash2 } from "lucide-react";
+import { ChevronDown, FileText, LayoutGrid, List, Move, Plus, RotateCcw, RotateCw, Trash2 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
 import { PageThumbnail } from "@/components/shared/PageThumbnail";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
+import { FileSizeLimitBanner } from "@/components/shared/FileSizeLimitBanner";
+import { UsageLimitModal } from "@/components/shared/UsageLimitModal";
 import { mergeEditedPages } from "@/lib/pdf/merge";
 import {
   createPageItemsFromDocuments,
   updatePageItemRotation,
 } from "@/lib/pdf/page-editor";
-import { downloadPDF, formatFileSize, getFriendlyPdfError, loadPdfFile } from "@/lib/utils";
+import {
+  FREE_MAX_FILE_SIZE_BYTES,
+  getUsage,
+  hasReachedDailyLimit,
+  trackUsage,
+} from "@/lib/usage";
+import { cn, downloadPDF, formatFileSize, getFriendlyPdfError, loadPdfFile } from "@/lib/utils";
 import type { PdfPageItem, UploadedPdfFile } from "@/types/pdf";
 
 function SortableMergePage({
@@ -111,8 +119,9 @@ export function MergeWorkspace() {
   const [files, setFiles] = useState<UploadedPdfFile[]>([]);
   const [pageItems, setPageItems] = useState<PdfPageItem[]>([]);
   const [expandedFileIds, setExpandedFileIds] = useState<Set<string>>(new Set());
-  const [reorderView, setReorderView] = useState<"all-pages" | "by-file">("all-pages");
+  const [reorderView, setReorderView] = useState<"all-pages" | "by-file">("by-file");
   const [activePageId, setActivePageId] = useState<string | null>(null);
+  const [showUsageModal, setShowUsageModal] = useState(false);
 
   const toggleExpanded = (fileId: string) => {
     setExpandedFileIds((prev) => {
@@ -171,6 +180,8 @@ export function MergeWorkspace() {
     try {
       const merged = await mergeEditedPages(pageItems);
       downloadPDF(merged, "merged.pdf");
+      trackUsage("merge");
+      if (hasReachedDailyLimit()) setShowUsageModal(true);
     } catch (err) {
       setError(getFriendlyPdfError(err));
     } finally {
@@ -182,7 +193,7 @@ export function MergeWorkspace() {
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-3">
-          <h1 className="text-3xl font-bold">Merge PDF Files Free</h1>
+          <h1 className="text-3xl font-bold">Merge PDF Files</h1>
           <p className="max-w-2xl text-gray-600 dark:text-slate-300">
             Upload multiple PDFs, then rotate and reorder pages before downloading a single combined file. You can reorder when merging as well—drag pages into the order you want.
           </p>
@@ -230,6 +241,15 @@ export function MergeWorkspace() {
         <div className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
           {error}
         </div>
+      ) : null}
+
+      {files.length > 0 &&
+      files.some((f) => f.size > FREE_MAX_FILE_SIZE_BYTES) ? (
+        <FileSizeLimitBanner
+          fileSizeMB={
+            Math.max(...files.map((f) => f.size)) / (1024 * 1024)
+          }
+        />
       ) : null}
 
       {files.length > 0 ? (
@@ -303,70 +323,115 @@ export function MergeWorkspace() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-8">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {groups.map((group) => {
                   const isExpanded = expandedFileIds.has(group.sourceFileId);
+                  const firstPage = group.items[0];
                   return (
-                    <section key={group.sourceFileId} className="space-y-4">
-                      <div className="glass-panel flex flex-wrap items-center justify-between gap-3 p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <FileText className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold">{group.sourceFileName}</h3>
-                            <p className="text-sm text-gray-600 dark:text-slate-300">
-                              {group.items.length} pages in the current merge sequence
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                          <span className="secondary-button pointer-events-none px-4">
-                            {formatFileSize(files.find((file) => file.id === group.sourceFileId)?.size ?? 0)}
-                          </span>
-                          <button
-                            type="button"
-                            className="secondary-button"
-                            onClick={() => toggleExpanded(group.sourceFileId)}
-                          >
-                            {isExpanded ? "Collapse pages" : "Expand pages"}
-                          </button>
-                          <button
-                            type="button"
-                            className="secondary-button gap-2 text-danger hover:border-danger hover:text-danger"
-                            onClick={() => {
-                              const nextFiles = files.filter((file) => file.id !== group.sourceFileId);
-                              setFiles(nextFiles);
-                              setPageItems((current) =>
-                                current.filter((item) => item.sourceFileId !== group.sourceFileId),
-                              );
-                              setExpandedFileIds((prev) => {
-                                const next = new Set(prev);
-                                next.delete(group.sourceFileId);
-                                return next;
-                              });
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Remove file
-                          </button>
-                        </div>
-                      </div>
-
+                    <section
+                      key={group.sourceFileId}
+                      className={cn("space-y-4", isExpanded && "col-span-full")}
+                    >
                       {isExpanded ? (
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
-                          {group.items.map((item) => (
-                            <SortableMergePage
-                              key={item.id}
-                              item={item}
-                              position={pageItems.findIndex((page) => page.id === item.id) + 1}
-                              onRotate={(pageId, delta) => {
-                                setPageItems((current) => updatePageItemRotation(current, pageId, delta));
-                              }}
-                            />
-                          ))}
+                        <>
+                          <div className="glass-panel flex flex-wrap items-center justify-between gap-3 p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <FileText className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold">{group.sourceFileName}</h3>
+                                <p className="text-sm text-gray-600 dark:text-slate-300">
+                                  {group.items.length} pages in the current merge sequence
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap gap-3">
+                              <span className="secondary-button pointer-events-none px-4">
+                                {formatFileSize(files.find((file) => file.id === group.sourceFileId)?.size ?? 0)}
+                              </span>
+                              <button
+                                type="button"
+                                className="secondary-button"
+                                onClick={() => toggleExpanded(group.sourceFileId)}
+                              >
+                                Collapse
+                              </button>
+                              <button
+                                type="button"
+                                className="secondary-button gap-2 text-danger hover:border-danger hover:text-danger"
+                                onClick={() => {
+                                  const nextFiles = files.filter((file) => file.id !== group.sourceFileId);
+                                  setFiles(nextFiles);
+                                  setPageItems((current) =>
+                                    current.filter((item) => item.sourceFileId !== group.sourceFileId),
+                                  );
+                                  setExpandedFileIds((prev) => {
+                                    const next = new Set(prev);
+                                    next.delete(group.sourceFileId);
+                                    return next;
+                                  });
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                Remove file
+                              </button>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
+                            {group.items.map((item) => (
+                              <SortableMergePage
+                                key={item.id}
+                                item={item}
+                                position={pageItems.findIndex((page) => page.id === item.id) + 1}
+                                onRotate={(pageId, delta) => {
+                                  setPageItems((current) => updatePageItemRotation(current, pageId, delta));
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => toggleExpanded(group.sourceFileId)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              toggleExpanded(group.sourceFileId);
+                            }
+                          }}
+                          className="glass-panel flex h-full cursor-pointer flex-col justify-between gap-3 p-4 transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                          title="Expand to see pages"
+                          aria-label={`Expand ${group.sourceFileName} to see its ${group.items.length} pages`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                              <FileText className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-semibold text-gray-900 dark:text-white">
+                                {group.sourceFileName}
+                              </div>
+                              <div className="text-xs text-gray-600 dark:text-slate-300">
+                                {group.items.length} {group.items.length === 1 ? "page" : "pages"} in this file
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
+                            <span>
+                              {formatFileSize(
+                                files.find((file) => file.id === group.sourceFileId)?.size ?? 0,
+                              )}
+                            </span>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">
+                              <ChevronDown className="h-3 w-3" />
+                              Expand pages
+                            </span>
+                          </div>
                         </div>
-                      ) : null}
+                      )}
                     </section>
                   );
                 })}
@@ -394,7 +459,36 @@ export function MergeWorkspace() {
         </section>
       ) : null}
 
+      {files.length > 0 ? (
+        <div className="sticky bottom-0 z-10 mt-6 border-t border-border bg-background/95 py-3 backdrop-blur">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-gray-600 dark:text-slate-300">
+              Ready to merge{" "}
+              <span className="font-semibold">
+                {pageItems.length} page{pageItems.length !== 1 ? "s" : ""}
+              </span>
+              .
+            </p>
+            <button
+              type="button"
+              className="primary-button"
+              disabled={pageItems.length < 2 || processing}
+              onClick={() => void handleMerge()}
+            >
+              Merge PDFs
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {processing ? <ProcessingSpinner label="Merging PDFs..." /> : null}
+
+      {showUsageModal ? (
+        <UsageLimitModal
+          usedToday={getUsage().dailyCount}
+          onClose={() => setShowUsageModal(false)}
+        />
+      ) : null}
     </div>
   );
 }

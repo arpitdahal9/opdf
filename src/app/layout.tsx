@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 
 import { Footer } from "@/components/layout/Footer";
@@ -22,8 +23,7 @@ const webApplicationJsonLd = {
   url: "https://pleasefixmypdf.com",
   applicationCategory: "UtilityApplication",
   operatingSystem: "Any",
-  offers: { "@type": "Offer", price: "0", priceCurrency: "AUD" },
-  description: "Free browser-based PDF tools. Merge, split, rotate, compress.",
+  description: "Browser-based PDF tools. Merge, split, rotate, compress. Private, no upload.",
   browserRequirements: "Requires JavaScript",
 };
 
@@ -55,17 +55,32 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="light" suppressHydrationWarning>
       <body className={`${inter.className} ${displaySerif.variable}`}>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd) }}
-        />
-        <div className="app-shell flex min-h-screen flex-col bg-background">
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+        <ClerkProvider
+          appearance={{
+            options: {
+              unsafe_disableDevelopmentModeWarnings: true,
+            },
+          }}
+          localization={{
+            signIn: {
+              start: {
+                title: "Sign in to PleaseFixMyPDF",
+              },
+            },
+          }}
+        >
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd) }}
+          />
+          <div className="app-shell flex min-h-screen flex-col bg-background">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </ClerkProvider>
       </body>
     </html>
   );

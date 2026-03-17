@@ -85,7 +85,7 @@ export function RotateWorkspace() {
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Rotate PDF Pages Free</h1>
+        <h1 className="text-3xl font-bold">Rotate PDF Pages</h1>
         <p className="max-w-2xl text-ink-muted dark:text-slate-300">
           Rotate any page left or right with an instant preview, or apply the same turn to the entire document.
         </p>

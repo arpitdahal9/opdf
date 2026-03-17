@@ -170,14 +170,14 @@ export function PdfToPngWorkspace() {
             key={i}
             className="rounded-xl border border-border bg-white dark:bg-gray-900 overflow-hidden"
           >
-            <div className="relative bg-gray-100 dark:bg-[#0d132a] min-h-[200px] flex items-center justify-center p-2">
+            <div className="relative bg-gray-100 dark:bg-[#0d132a] min-h-[160px] flex items-center justify-center p-2 overflow-hidden">
               <PageThumbnail
                 pdfBytes={pdfBytes}
                 pageIndex={i}
-                width={280}
+                width={200}
                 compact
                 hidePageBadge
-                className="max-h-[320px] w-auto"
+                className="max-h-[160px] w-auto"
               />
             </div>
             <div className="flex items-center justify-between gap-2 p-3 border-t border-border dark:border-gray-700">

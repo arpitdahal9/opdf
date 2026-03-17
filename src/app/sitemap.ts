@@ -1,27 +1,41 @@
 import type { MetadataRoute } from "next";
 
+import { blogSlugs } from "@/lib/blog";
+import {
+  allConversionPaths,
+  allToolPaths,
+  alternativePaths,
+  audiencePaths,
+  comparePaths,
+  microToolPaths,
+  staticRoutes,
+} from "@/lib/content";
+
 export const dynamic = "force-static";
 
+const baseUrl = "https://pleasefixmypdf.com";
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://pleasefixmypdf.com";
-  const routes = [
-    "",
-    "/merge",
-    "/split",
-    "/rotate",
-    "/reorder",
-    "/compress",
-    "/word-to-pdf",
-    "/pdf-to-word",
-    "/image-to-pdf",
-    "/converter",
-    "/about",
+  const routes: string[] = [
+    ...staticRoutes,
+    "/tools",
+    "/blog",
+    ...allToolPaths,
+    ...allConversionPaths,
+    ...microToolPaths,
+    ...comparePaths,
+    ...alternativePaths,
+    ...audiencePaths,
+    ...blogSlugs.map((slug) => `/blog/${slug}`),
   ];
 
-  return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: "2025-06-01",
-    changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : 0.8,
-  }));
+  return routes.map((route) => {
+    const changeFrequency: "weekly" | "monthly" = route === "" ? "weekly" : "monthly";
+    return {
+      url: route ? `${baseUrl}${route}` : baseUrl,
+      lastModified: new Date(),
+      changeFrequency,
+      priority: route === "" ? 1 : route.startsWith("/blog") ? 0.6 : 0.8,
+    };
+  });
 }

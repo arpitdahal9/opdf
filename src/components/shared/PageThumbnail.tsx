@@ -17,6 +17,8 @@ export function PageThumbnail({
   badge,
   label,
   className,
+  compact = false,
+  hidePageBadge = false,
 }: {
   pdfBytes: Uint8Array;
   pageIndex: number;
@@ -28,6 +30,10 @@ export function PageThumbnail({
   badge?: string;
   label?: string;
   className?: string;
+  /** Shorter min-height for use in collapsed/file cards */
+  compact?: boolean;
+  /** Hide the "Page N" badge (e.g. in compact/collapsed view) */
+  hidePageBadge?: boolean;
 }) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +80,7 @@ export function PageThumbnail({
             : undefined,
         )}
       >
-        <div className="relative flex min-h-[320px] items-center justify-center overflow-hidden bg-gray-100 dark:bg-[#0d132a] p-4">
+        <div className={cn("relative flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-[#0d132a] p-4", compact ? "min-h-[200px]" : "min-h-[320px]")}>
           {thumbnailUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -86,7 +92,7 @@ export function PageThumbnail({
           ) : error ? (
             <div className="px-4 text-center text-xs text-danger">{error}</div>
           ) : (
-            <div className="h-[290px] w-full animate-pulse rounded-lg bg-gray-200 dark:bg-white/10" />
+            <div className={cn("w-full animate-pulse rounded-lg bg-gray-200 dark:bg-white/10", compact ? "h-[180px]" : "h-[290px]")} />
           )}
 
           {selected ? (
@@ -107,9 +113,11 @@ export function PageThumbnail({
             </div>
           ) : null}
 
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-medium text-white">
-            Page {pageIndex + 1}
-          </div>
+          {!hidePageBadge ? (
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-medium text-white">
+              Page {pageIndex + 1}
+            </div>
+          ) : null}
         </div>
       </div>
       {children ? <div className="flex items-center justify-center gap-2">{children}</div> : null}

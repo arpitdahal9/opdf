@@ -1,6 +1,13 @@
 "use client";
 
 import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
+import {
   FileText,
   Image as ImageIcon,
   Menu,
@@ -16,8 +23,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
-
 const redLinkHrefs = new Set(["/split", "/reorder", "/pdf-to-word", "/compress"]);
 const blueLinkHrefs = new Set(["/merge", "/rotate", "/word-to-pdf", "/image-to-pdf"]);
 
@@ -30,6 +35,7 @@ const pdfTools: { href: string; label: string; icon: LucideIcon }[] = [
 const pdfConverter: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/word-to-pdf", label: "Word to PDF", icon: FileText },
   { href: "/pdf-to-word", label: "PDF to Word", icon: FileText },
+  { href: "/pdf-to-jpg", label: "PDF to JPG", icon: ImageIcon },
   { href: "/compress", label: "Compress PDF", icon: Minimize2 },
   { href: "/image-to-pdf", label: "Image to PDF", icon: ImageIcon },
 ];
@@ -216,18 +222,55 @@ export function Navbar() {
         </nav>
         <div className="flex shrink-0 items-center gap-1">
           <Link
+            href="/pricing"
+            className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            Pricing
+          </Link>
+          <Link
             href="/about"
             className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             About
           </Link>
           <Link
-            href="/#tools"
+            href="/tools"
             className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             All tools
           </Link>
-          <ThemeToggle />
+          <SignedOut>
+            <div className="hidden lg:flex items-center gap-1">
+              <SignInButton mode="modal">
+                <button
+                  type="button"
+                  className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                >
+                  Log in
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button
+                  type="button"
+                  className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-white bg-primary hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                >
+                  Sign up
+                </button>
+              </SignUpButton>
+            </div>
+          </SignedOut>
+          <SignedIn>
+            <div className="hidden lg:block">
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: "h-9 w-9",
+                  },
+                }}
+              />
+            </div>
+          </SignedIn>
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
@@ -302,6 +345,13 @@ export function Navbar() {
               </div>
               <div className="mt-4 border-t border-border px-2 pt-4 dark:border-gray-700">
                 <Link
+                  href="/pricing"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                  Pricing
+                </Link>
+                <Link
                   href="/about"
                   onClick={closeMobileMenu}
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
@@ -309,12 +359,47 @@ export function Navbar() {
                   About
                 </Link>
                 <Link
-                  href="/#tools"
+                  href="/tools"
                   onClick={closeMobileMenu}
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   All tools
                 </Link>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button
+                      type="button"
+                      onClick={closeMobileMenu}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                    >
+                      Log in
+                    </button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <button
+                      type="button"
+                      onClick={closeMobileMenu}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                    >
+                      Sign up
+                    </button>
+                  </SignUpButton>
+                </SignedOut>
+                <SignedIn>
+                  <div className="flex items-center gap-3 px-3 py-2.5">
+                    <UserButton
+                      afterSignOutUrl="/"
+                      appearance={{
+                        elements: {
+                          avatarBox: "h-9 w-9",
+                        },
+                      }}
+                    />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Account
+                    </span>
+                  </div>
+                </SignedIn>
               </div>
             </nav>
           </div>

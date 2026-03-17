@@ -47,12 +47,12 @@ function SortableImageCard({
     >
       <div className="space-y-3">
         <div className="group relative overflow-hidden rounded-lg border border-border bg-white shadow-sm">
-          <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-[#0d132a] p-4">
+          <div className="relative flex min-h-[160px] items-center justify-center overflow-hidden bg-[#0d132a] p-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.previewUrl}
               alt={item.name}
-              className="h-auto max-h-[360px] max-w-full rounded-md object-contain shadow-sm"
+              className="max-h-[160px] w-auto max-w-full rounded-md object-contain shadow-sm"
             />
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-medium text-white">
               Image {position}
@@ -147,7 +147,7 @@ export function ImageToPdfWorkspace() {
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Convert Images to PDF Free</h1>
+        <h1 className="text-3xl font-bold">Convert Images to PDF</h1>
         <p className="max-w-2xl text-gray-600 dark:text-slate-300">
           Turn multiple images into a single, clean PDF. Reorder pages and download instantly — all
           in your browser.
