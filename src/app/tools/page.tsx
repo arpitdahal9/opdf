@@ -7,6 +7,7 @@ import {
   Merge,
   Minimize2,
   Move,
+  PenLine,
   RotateCw,
   Scissors,
   type LucideIcon,
@@ -35,6 +36,7 @@ const toolIcons: Record<string, LucideIcon> = {
   rotate: RotateCw,
   reorder: Move,
   compress: Minimize2,
+  "sign-pdf": PenLine,
 };
 
 const conversionIcons: Record<string, LucideIcon> = {

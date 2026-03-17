@@ -5,6 +5,7 @@ import {
   Image as ImageIcon,
   Lock,
   Minimize2,
+  PenLine,
   RotateCw,
   Scissors,
   Workflow,
@@ -108,6 +109,13 @@ const tools = [
     description: "Extract text from PDFs or turn text into a simple PDF.",
     icon: FileText,
     accent: "blue" as const,
+  },
+  {
+    href: "/sign-pdf",
+    title: "Sign PDF",
+    description: "Draw a signature and stamp it onto every page of a PDF.",
+    icon: PenLine,
+    accent: "red" as const,
   },
 ];
 

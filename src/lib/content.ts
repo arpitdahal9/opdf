@@ -49,6 +49,12 @@ export const allTools: ToolItem[] = [
     name: "Compress PDF",
     description: "Reduce PDF file size. Works in your browser.",
   },
+  {
+    slug: "sign-pdf",
+    path: "/sign-pdf",
+    name: "Sign PDF",
+    description: "Draw and apply a signature to every page of a PDF.",
+  },
 ];
 
 export const allConversions: ConversionItem[] = [
