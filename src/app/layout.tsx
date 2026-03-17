@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 
+import { ClerkProviderClient } from "@/components/providers/ClerkProviderClient";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 
@@ -57,20 +57,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className="light" suppressHydrationWarning>
       <body className={`${inter.className} ${displaySerif.variable}`}>
-        <ClerkProvider
-          appearance={{
-            layout: {
-              unsafe_disableDevelopmentModeWarnings: true,
-            },
-          }}
-          localization={{
-            signIn: {
-              start: {
-                title: "Sign in to PleaseFixMyPDF",
-              },
-            },
-          }}
-        >
+        <ClerkProviderClient>
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd) }}
@@ -80,7 +67,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
-        </ClerkProvider>
+        </ClerkProviderClient>
       </body>
     </html>
   );
