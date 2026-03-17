@@ -5,15 +5,20 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:webpack": "next build --webpack",
     "start": "next start",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.14.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@lemonsqueezy/lemonsqueezy.js": "^2.2.0",
+    "@types/jszip": "^3.4.0",
     "clsx": "^2.1.1",
     "docx": "^9.6.1",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.577.0",
     "mammoth": "^1.12.0",
     "next": "^16.1.6",
