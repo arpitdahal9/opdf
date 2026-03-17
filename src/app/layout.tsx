@@ -59,7 +59,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={`${inter.className} ${displaySerif.variable}`}>
         <ClerkProvider
           appearance={{
-            options: {
+            layout: {
               unsafe_disableDevelopmentModeWarnings: true,
             },
           }}
