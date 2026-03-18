@@ -37,7 +37,7 @@ export function FileDropzone({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div
         role="button"
         tabIndex={0}
@@ -99,6 +99,13 @@ export function FileDropzone({
           onChange={(event) => updateFiles(event.target.files)}
         />
       </div>
+
+      <p className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-gray-400">
+        <span role="img" aria-hidden>
+          🔒
+        </span>
+        <span>Your files are processed in your browser and never leave this device.</span>
+      </p>
 
       {error ? (
         <div className="rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">

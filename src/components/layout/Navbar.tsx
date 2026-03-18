@@ -1,10 +1,12 @@
 "use client";
 
 import {
+  ArrowUpDown,
   FileText,
   Image as ImageIcon,
   Menu,
   Minimize2,
+  PenLine,
   type LucideIcon,
   RotateCw,
   Scissors,
@@ -23,14 +25,20 @@ const pdfTools: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/merge", label: "Merge PDF", icon: Workflow },
   { href: "/split", label: "Split PDF", icon: Scissors },
   { href: "/rotate", label: "Rotate PDF", icon: RotateCw },
+  { href: "/reorder", label: "Reorder PDF", icon: ArrowUpDown },
+  { href: "/compress", label: "Compress PDF", icon: Minimize2 },
+  { href: "/sign-pdf", label: "Sign PDF", icon: PenLine },
 ];
 
 const pdfConverter: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/word-to-pdf", label: "Word to PDF", icon: FileText },
   { href: "/pdf-to-word", label: "PDF to Word", icon: FileText },
-  { href: "/pdf-to-jpg", label: "PDF to JPG", icon: ImageIcon },
-  { href: "/compress", label: "Compress PDF", icon: Minimize2 },
   { href: "/image-to-pdf", label: "Image to PDF", icon: ImageIcon },
+  { href: "/pdf-to-jpg", label: "PDF to JPG", icon: ImageIcon },
+  { href: "/pdf-to-png", label: "PDF to PNG", icon: ImageIcon },
+  { href: "/jpg-to-pdf", label: "JPG to PDF", icon: ImageIcon },
+  { href: "/png-to-pdf", label: "PNG to PDF", icon: ImageIcon },
+  { href: "/pdf-to-text", label: "PDF to Text", icon: FileText },
 ];
 
 function DropdownItem({

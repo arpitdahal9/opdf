@@ -27,7 +27,22 @@ const compressFaq = [
   {
     question: "Is there a file size limit?",
     answer:
-      "No server-side limits since everything runs in your browser. Performance depends on your device.",
+      "There is no hard server-side limit because compression runs in your browser. Very large files may still be limited by your device memory and browser.",
+  },
+  {
+    question: "Will compressing a PDF reduce image quality?",
+    answer:
+      "Compression usually reduces image size by lowering resolution or quality. Text remains sharp, but highly compressed PDFs can show some softness in photos or scans.",
+  },
+  {
+    question: "Can I compress a PDF for email?",
+    answer:
+      "Yes. Use the Compress PDF tool to create a smaller version of your PDF that is easier to send via email or upload to portals.",
+  },
+  {
+    question: "Does compression affect the original PDF?",
+    answer:
+      "No. Compression creates a new optimised PDF for download. Your original file stays on your device unchanged.",
   },
 ];
 
@@ -43,6 +58,19 @@ const breadcrumbs = [
 ];
 
 export default function CompressPage() {
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: compressFaq.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <>
       <BreadcrumbSchema items={breadcrumbs} />
@@ -50,6 +78,10 @@ export default function CompressPage() {
       <div className="page-wrap mx-auto max-w-4xl space-y-10 px-4 pb-12">
         <FAQSection items={compressFaq} />
         <RelatedTools tools={relatedTools} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
       </div>
     </>
   );

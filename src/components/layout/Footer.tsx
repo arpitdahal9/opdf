@@ -65,6 +65,12 @@ export function Footer() {
               <li>
                 <Link href="/blog" className="hover:text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded">Blog</Link>
               </li>
+              <li>
+                <Link href="/privacy" className="hover:text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded">Privacy policy</Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded">Terms of service</Link>
+              </li>
             </ul>
           </div>
           <div>
