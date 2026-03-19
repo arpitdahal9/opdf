@@ -332,7 +332,7 @@ export default function HomePage() {
       </section>
 
       {/* All in one + Privacy + Benefits */}
-      <section className="card-surface mx-auto max-w-6xl space-y-8 p-6 sm:p-8" aria-label="All in one tool and benefits">
+      <section className="card-surface mx-auto max-w-7xl space-y-8 p-6 sm:p-8" aria-label="All in one tool and benefits">
         {/* All in one tool */}
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           <div className="shrink-0">

@@ -11,7 +11,7 @@ export function Footer() {
   const lang = useLanguage();
   return (
     <footer className="mt-auto border-t border-border bg-white px-4 py-8 text-sm text-gray-600 dark:bg-gray-900 dark:text-gray-400">
-      <div className="mx-auto max-w-6xl sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">{t(lang, "footerPdfTools")}</h3>
