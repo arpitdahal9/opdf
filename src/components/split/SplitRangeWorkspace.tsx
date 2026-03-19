@@ -1,7 +1,7 @@
 "use client";
 
 import JSZip from "jszip";
-import { Plus, Download } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
@@ -72,27 +72,29 @@ function RangePreview({
 
   return (
     <div className="space-y-2">
-      <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">{label}</div>
-      <div className="flex items-start gap-4">
-        <div className="w-[160px]">
-          <PageThumbnail pdfBytes={pdfBytes} pageIndex={firstIndex} compact width={160} />
-          <div className="mt-1 text-center text-[11px] text-gray-500 dark:text-gray-400">
-            {range.from}
-          </div>
-        </div>
-        {showDots ? (
-          <div className="flex h-[220px] w-10 items-center justify-center text-2xl text-gray-400">
-            …
-          </div>
-        ) : null}
-        {count > 1 ? (
-          <div className="w-[160px]">
-            <PageThumbnail pdfBytes={pdfBytes} pageIndex={lastIndex} compact width={160} />
+      <div className="text-center text-xs font-medium text-gray-600 dark:text-gray-400">{label}</div>
+      <div className="rounded-lg border border-dashed border-gray-300 bg-white/60 p-4 dark:border-gray-700 dark:bg-gray-900/40">
+        <div className="mx-auto flex max-w-[520px] items-start justify-center gap-6">
+          <div className="w-[170px]">
+            <PageThumbnail pdfBytes={pdfBytes} pageIndex={firstIndex} compact width={170} />
             <div className="mt-1 text-center text-[11px] text-gray-500 dark:text-gray-400">
-              {range.to}
+              {range.from}
             </div>
           </div>
-        ) : null}
+          {showDots ? (
+            <div className="flex h-[240px] w-10 items-center justify-center text-2xl text-gray-400">
+              …
+            </div>
+          ) : null}
+          {count > 1 ? (
+            <div className="w-[170px]">
+              <PageThumbnail pdfBytes={pdfBytes} pageIndex={lastIndex} compact width={170} />
+              <div className="mt-1 text-center text-[11px] text-gray-500 dark:text-gray-400">
+                {range.to}
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -204,25 +206,9 @@ export function SplitRangeWorkspace() {
   }
 
   return (
-    <div className="page-wrap animate-fadeIn space-y-6">
-      <section className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Split</h1>
-          <p className="text-sm text-gray-600 dark:text-slate-300">
-            {document.name} · {formatFileSize(document.size)} · {document.pageCount} page{document.pageCount === 1 ? "" : "s"}
-          </p>
-        </div>
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={() => {
-            setDocument(null);
-            setCustomRanges([]);
-            setError(null);
-          }}
-        >
-          Try another file
-        </button>
+    <div className="page-wrap animate-fadeIn space-y-5">
+      <section className="space-y-1">
+        <h1 className="text-3xl font-bold">Split</h1>
       </section>
 
       {error ? (
@@ -231,40 +217,43 @@ export function SplitRangeWorkspace() {
         </div>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        {/* Preview */}
-        <section className="rounded-xl border border-border bg-white p-5 dark:bg-gray-900 dark:border-gray-700">
-          <div className="space-y-6">
+      <div className="grid gap-0 overflow-hidden rounded-xl border border-border bg-white dark:border-gray-700 dark:bg-gray-900 lg:grid-cols-[minmax(0,1fr)_360px]">
+        {/* Preview canvas (wide light area) */}
+        <section className="bg-gray-50 p-6 dark:bg-[#0b1020]">
+          <div className="space-y-8">
             {ranges.map((r, idx) => (
-              <RangePreview
-                key={r.id}
-                pdfBytes={document.bytes}
-                range={r}
-                label={`Range ${idx + 1}`}
-              />
+              <RangePreview key={r.id} pdfBytes={document.bytes} range={r} label={`Range ${idx + 1}`} />
             ))}
           </div>
         </section>
 
-        {/* Sidebar */}
-        <aside className="rounded-xl border border-border bg-white p-5 dark:bg-gray-900 dark:border-gray-700 space-y-5">
-          <div className="space-y-2">
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Range</h2>
+        {/* Right sidebar */}
+        <aside className="border-t border-border bg-white p-5 dark:border-gray-700 dark:bg-gray-900 lg:border-l lg:border-t-0 space-y-5">
+          <div className="flex items-center justify-between">
+            <div className="text-lg font-semibold text-gray-900 dark:text-white">Split</div>
           </div>
 
           <div className="space-y-3">
             <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">Range mode:</p>
-            <div className="flex rounded-lg border border-border bg-gray-50 p-1 dark:border-gray-700 dark:bg-gray-800">
+            <div className="flex rounded-lg border border-border bg-white p-1 dark:border-gray-700 dark:bg-gray-900">
               <button
                 type="button"
-                className={mode === "custom" ? "primary-button flex-1 !min-h-9" : "secondary-button flex-1 !min-h-9"}
+                className={
+                  mode === "custom"
+                    ? "flex-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white"
+                    : "flex-1 rounded-md px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                }
                 onClick={() => setMode("custom")}
               >
                 Custom
               </button>
               <button
                 type="button"
-                className={mode === "fixed" ? "primary-button flex-1 !min-h-9" : "secondary-button flex-1 !min-h-9"}
+                className={
+                  mode === "fixed"
+                    ? "flex-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white"
+                    : "flex-1 rounded-md px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                }
                 onClick={() => setMode("fixed")}
               >
                 Fixed
@@ -390,7 +379,36 @@ export function SplitRangeWorkspace() {
 
       {processing ? <ProcessingSpinner label="Splitting your PDF..." /> : null}
 
-      <FileDropzone multiple={false} onFilesSelected={handleFile} helperText="Choose another PDF to split." showProBatchHint />
+      <div className="rounded-xl border border-border bg-white p-4 dark:bg-gray-900 dark:border-gray-700">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            <span className="font-semibold">{document.name}</span>{" "}
+            <span className="text-gray-500 dark:text-gray-400">
+              | {formatFileSize(document.size)} | {document.pageCount} page{document.pageCount === 1 ? "" : "s"}
+            </span>
+          </p>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => {
+              setDocument(null);
+              setCustomRanges([]);
+              setError(null);
+            }}
+          >
+            Try another file
+          </button>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-white p-5 dark:bg-gray-900 dark:border-gray-700">
+        <FileDropzone
+          multiple={false}
+          onFilesSelected={handleFile}
+          helperText="Choose another PDF to split."
+          showProBatchHint
+        />
+      </div>
     </div>
   );
 }
