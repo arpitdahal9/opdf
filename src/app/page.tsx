@@ -1,12 +1,17 @@
 import {
   ArrowUpDown,
+  Calculator,
   FileText,
+  FileSearch,
   Gauge,
   Image as ImageIcon,
   Lock,
   Minimize2,
   PenLine,
+  QrCode,
   RotateCw,
+  ScanText,
+  Shrink,
   Scissors,
   Workflow,
   Zap,
@@ -118,6 +123,41 @@ const tools = [
     icon: PenLine,
     accent: "red" as const,
   },
+  {
+    href: "/tools/pdf-page-counter",
+    title: "PDF page counter",
+    description: "Instantly count pages in your PDF — runs in your browser.",
+    icon: Calculator,
+    accent: "blue" as const,
+  },
+  {
+    href: "/tools/pdf-metadata-viewer",
+    title: "PDF metadata viewer",
+    description: "See PDF title, author, creator, and more — locally in your browser.",
+    icon: FileSearch,
+    accent: "red" as const,
+  },
+  {
+    href: "/tools/pdf-file-size-checker",
+    title: "PDF file size checker",
+    description: "Quickly check PDF file size and share-ready limits — no upload.",
+    icon: Shrink,
+    accent: "blue" as const,
+  },
+  {
+    href: "/tools/image-to-text",
+    title: "Image to Text (OCR)",
+    description: "Extract text from images using OCR — 100% in-browser.",
+    icon: ScanText,
+    accent: "red" as const,
+  },
+  {
+    href: "/tools/qr-code-generator",
+    title: "QR code generator",
+    description: "Generate and download QR codes for URLs, text, and more.",
+    icon: QrCode,
+    accent: "blue" as const,
+  },
 ];
 
 const featureCards = [
@@ -160,7 +200,7 @@ export default function HomePage() {
                 href="/tools"
                 className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary dark:text-gray-300"
               >
-                View all 14 tools
+                View all {tools.length} tools
               </Link>
             </div>
           </div>

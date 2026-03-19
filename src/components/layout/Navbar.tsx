@@ -2,8 +2,13 @@
 
 import {
   ArrowUpDown,
+  Calculator,
   FileText,
+  FileSearch,
   Image as ImageIcon,
+  QrCode,
+  ScanText,
+  Shrink,
   Menu,
   Minimize2,
   PenLine,
@@ -22,7 +27,17 @@ import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/language";
 
 const redLinkHrefs = new Set(["/split", "/reorder", "/pdf-to-word", "/compress"]);
-const blueLinkHrefs = new Set(["/merge", "/rotate", "/word-to-pdf", "/image-to-pdf"]);
+const blueLinkHrefs = new Set([
+  "/merge",
+  "/rotate",
+  "/word-to-pdf",
+  "/image-to-pdf",
+  "/tools/pdf-page-counter",
+  "/tools/pdf-metadata-viewer",
+  "/tools/pdf-file-size-checker",
+  "/tools/image-to-text",
+  "/tools/qr-code-generator",
+]);
 
 const pdfTools: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/merge", label: "Merge PDF", icon: Workflow },
@@ -42,6 +57,14 @@ const pdfConverter: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/jpg-to-pdf", label: "JPG to PDF", icon: ImageIcon },
   { href: "/png-to-pdf", label: "PNG to PDF", icon: ImageIcon },
   { href: "/pdf-to-text", label: "PDF to Text", icon: FileText },
+];
+
+const utilities: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/tools/pdf-page-counter", label: "PDF page counter", icon: Calculator },
+  { href: "/tools/pdf-metadata-viewer", label: "PDF metadata viewer", icon: FileSearch },
+  { href: "/tools/pdf-file-size-checker", label: "PDF file size checker", icon: Shrink },
+  { href: "/tools/image-to-text", label: "Image to Text (OCR)", icon: ScanText },
+  { href: "/tools/qr-code-generator", label: "QR code generator", icon: QrCode },
 ];
 
 function DropdownItem({
@@ -167,7 +190,7 @@ function Dropdown({
 export function Navbar() {
   const pathname = usePathname();
   const lang = useLanguage();
-  const [openDropdown, setOpenDropdown] = useState<"tools" | "converter" | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<"tools" | "converter" | "utilities" | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -223,6 +246,15 @@ export function Navbar() {
             onEnter={() => setOpenDropdown("converter")}
             onLeave={() => setOpenDropdown(null)}
             sectionLabel={t(lang, "convertAndCompress")}
+          />
+          <Dropdown
+            label={t(lang, "utilities")}
+            items={utilities}
+            pathname={pathname}
+            open={openDropdown === "utilities"}
+            onEnter={() => setOpenDropdown("utilities")}
+            onLeave={() => setOpenDropdown(null)}
+            sectionLabel={t(lang, "utilitiesSection")}
           />
         </nav>
         <div className="flex shrink-0 items-center gap-1">
@@ -318,6 +350,21 @@ export function Navbar() {
                   {t(lang, "pdfConverter")}
                 </p>
                 {pdfConverter.map((item) => (
+                  <DropdownItem
+                    key={item.href}
+                    href={item.href}
+                    label={item.label}
+                    icon={item.icon}
+                    pathname={pathname}
+                    onClick={closeMobileMenu}
+                  />
+                ))}
+              </div>
+              <div className="mt-4 px-2 space-y-1">
+                <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  {t(lang, "utilities")}
+                </p>
+                {utilities.map((item) => (
                   <DropdownItem
                     key={item.href}
                     href={item.href}

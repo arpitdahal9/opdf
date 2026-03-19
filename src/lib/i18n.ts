@@ -4,8 +4,10 @@ type I18nKey =
   | "language"
   | "pdfTools"
   | "pdfConverter"
+  | "utilities"
   | "editAndOrganize"
   | "convertAndCompress"
+  | "utilitiesSection"
   | "pricing"
   | "about"
   | "allTools"
@@ -29,8 +31,10 @@ const DICT: Record<LanguageCode, Record<I18nKey, string>> = {
     language: "Language",
     pdfTools: "PDF Tools",
     pdfConverter: "PDF Converter",
+    utilities: "Utilities",
     editAndOrganize: "Edit & organize",
     convertAndCompress: "Convert & compress",
+    utilitiesSection: "Utilities",
     pricing: "Pricing",
     about: "About",
     allTools: "All tools",
@@ -53,8 +57,10 @@ const DICT: Record<LanguageCode, Record<I18nKey, string>> = {
     language: "भाषा",
     pdfTools: "PDF टूल्स",
     pdfConverter: "PDF कन्वर्टर",
+    utilities: "यूटिलिटीज़",
     editAndOrganize: "एडिट और व्यवस्थित करें",
     convertAndCompress: "कन्वर्ट और कंप्रेस",
+    utilitiesSection: "यूटिलिटीज़",
     pricing: "मूल्य",
     about: "परिचय",
     allTools: "सभी टूल्स",
@@ -77,8 +83,10 @@ const DICT: Record<LanguageCode, Record<I18nKey, string>> = {
     language: "भाषा",
     pdfTools: "PDF उपकरणहरू",
     pdfConverter: "PDF कनभर्टर",
+    utilities: "उपयोगी उपकरण",
     editAndOrganize: "सम्पादन र व्यवस्थापन",
     convertAndCompress: "कनभर्ट र कम्प्रेस",
+    utilitiesSection: "उपयोगी उपकरण",
     pricing: "मूल्य",
     about: "बारेमा",
     allTools: "सबै उपकरण",
@@ -101,8 +109,10 @@ const DICT: Record<LanguageCode, Record<I18nKey, string>> = {
     language: "语言",
     pdfTools: "PDF 工具",
     pdfConverter: "PDF 转换",
+    utilities: "实用工具",
     editAndOrganize: "编辑与整理",
     convertAndCompress: "转换与压缩",
+    utilitiesSection: "实用工具",
     pricing: "价格",
     about: "关于",
     allTools: "全部工具",

@@ -8,6 +8,8 @@ import {
   Minimize2,
   Move,
   PenLine,
+  QrCode,
+  ScanText,
   RotateCw,
   Scissors,
   type LucideIcon,
@@ -127,6 +129,20 @@ export default function ToolsHubPage() {
               title="PDF file size checker"
               description="Check PDF file size. No upload."
               icon={Minimize2}
+              accent="blue"
+            />
+            <ToolCard
+              href="/tools/image-to-text"
+              title="Image to Text (OCR)"
+              description="Extract text from images in your browser."
+              icon={ScanText}
+              accent="blue"
+            />
+            <ToolCard
+              href="/tools/qr-code-generator"
+              title="QR code generator"
+              description="Generate a QR code from any text or URL."
+              icon={QrCode}
               accent="blue"
             />
           </div>

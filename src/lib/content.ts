@@ -136,6 +136,8 @@ export const microToolPaths = [
   "/tools/pdf-page-counter",
   "/tools/pdf-metadata-viewer",
   "/tools/pdf-file-size-checker",
+  "/tools/image-to-text",
+  "/tools/qr-code-generator",
 ];
 
 /** Compare and alternative page paths. */
