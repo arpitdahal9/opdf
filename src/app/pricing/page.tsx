@@ -28,7 +28,7 @@ const freeFeatures = [
   "Merge, split, rotate, reorder, compress",
   "Word to PDF, PDF to Word, image to PDF",
   "10MB max file size",
-  "No signup required",
+  "No uploads (browser-based)",
 ];
 
 const proFeatures = [

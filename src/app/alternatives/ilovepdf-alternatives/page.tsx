@@ -49,7 +49,7 @@ export default function IlovepdfAlternativesPage() {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">PleaseFixMyPDF as an iLovePDF alternative</h2>
           <p className="text-gray-700 dark:text-gray-300">
             We offer merge, split, rotate, reorder, compress, Word to PDF, PDF to Word, image to
-            PDF, and PDF to JPG — all in your browser. No upload, no signup required to start. Your
+            PDF, and PDF to JPG — all in your browser. No upload to our servers. Your
             files never leave your device.
           </p>
           <Link href="/tools" className="primary-button inline-block">

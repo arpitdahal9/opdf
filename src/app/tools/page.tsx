@@ -63,8 +63,7 @@ export default function ToolsHubPage() {
         <section className="space-y-4">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">All PDF tools</h1>
           <p className="max-w-2xl text-ink-muted dark:text-slate-300">
-            Merge, split, rotate, reorder, compress, and convert — everything runs in your browser.
-            No uploads, no signup.
+            Merge, split, rotate, reorder, compress, and convert — everything runs in your browser. No uploads.
           </p>
         </section>
 

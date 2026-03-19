@@ -54,7 +54,7 @@ export function CompareCta() {
   return (
     <div className="rounded-xl border-2 border-primary bg-primary/5 p-6 dark:bg-primary/10 text-center">
       <p className="font-semibold text-gray-900 dark:text-white mb-2">
-        Try PleaseFixMyPDF — no signup required
+        Try PleaseFixMyPDF in your browser
       </p>
       <Link href="/tools" className="primary-button inline-block">
         View all tools

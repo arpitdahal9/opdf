@@ -20,7 +20,7 @@ export const allBlogPosts: BlogPost[] = [
     slug: "how-to-merge-pdf-files",
     title: "How to merge PDF files for free — step-by-step | PleaseFixMyPDF",
     description:
-      "Learn how to combine multiple PDFs into one document in your browser. No uploads, no signup. Step-by-step guide with screenshots.",
+      "Learn how to combine multiple PDFs into one document in your browser. No uploads to our servers. Step-by-step guide with screenshots.",
     h1: "How to merge PDF files for free",
     updatedAt: "2025-03-01",
     faqs: [
@@ -72,7 +72,7 @@ export const allBlogPosts: BlogPost[] = [
     ],
     body: [
       "To compress a PDF, open our Compress PDF tool, add your file, and download the smaller version. Processing runs in your browser, so your document stays on your device.",
-      "Step 1: Go to the Compress PDF tool. Step 2: Select your PDF (or drag and drop). Step 3: Wait for the optimised file to be generated, then download. No signup or server upload required.",
+      "Step 1: Go to the Compress PDF tool. Step 2: Select your PDF (or drag and drop). Step 3: Wait for the optimised file to be generated, then download. No server upload required.",
       "We use client-side processing so your files never leave your computer. That’s ideal for confidential or work documents compared to tools that upload to the cloud.",
     ],
   },
@@ -146,7 +146,7 @@ export const allBlogPosts: BlogPost[] = [
       {
         question: "Is Word to PDF conversion free?",
         answer:
-          "Yes. PleaseFixMyPDF lets you convert Word to PDF in your browser with no signup. Limits may apply on the free tier.",
+          "Yes. PleaseFixMyPDF lets you convert Word to PDF in your browser with no server upload. Limits may apply on the free tier.",
       },
       {
         question: "Do my files get uploaded?",

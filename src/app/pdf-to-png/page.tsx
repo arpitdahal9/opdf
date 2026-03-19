@@ -28,7 +28,7 @@ const faqs = [
   {
     question: "Is PDF to PNG conversion free?",
     answer:
-      "Yes. PleaseFixMyPDF converts PDF pages to PNG in your browser. No upload and no signup required.",
+      "Yes. PleaseFixMyPDF converts PDF pages to PNG in your browser without uploading files to any server.",
   },
   {
     question: "Do my files get uploaded to a server?",

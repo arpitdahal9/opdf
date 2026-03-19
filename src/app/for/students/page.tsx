@@ -35,7 +35,7 @@ export default function ForStudentsPage() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">PDF tools for students</h1>
           <p className="text-gray-600 dark:text-slate-300">
             Merge assignment PDFs, compress for submission limits, and convert Word to PDF — all in
-            your browser. No upload, no signup required.
+            your browser. No upload.
           </p>
         </header>
 

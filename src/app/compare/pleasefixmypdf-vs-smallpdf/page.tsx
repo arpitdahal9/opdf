@@ -24,7 +24,7 @@ const breadcrumbs = [
 const featureRows = [
   { feature: "Processing", pleasefix: "In your browser (client-side)", competitor: "On their servers" },
   { feature: "Privacy", pleasefix: true, competitor: "Files uploaded to servers" },
-  { feature: "Free tier", pleasefix: "5 operations/day, no signup", competitor: "2 tasks/day" },
+  { feature: "Free tier", pleasefix: "5 operations/day", competitor: "2 tasks/day" },
   { feature: "Cheapest paid", pleasefix: "$49.95 lifetime or $4/mo", competitor: "$10/mo (~$120/year)" },
 ];
 

@@ -111,73 +111,19 @@ export default function AboutPage() {
 
         <section className="space-y-6 border-t border-border pt-8 dark:border-gray-700">
           <h2 className="font-display text-xl font-semibold text-gray-900 dark:text-white">
-            The Cloud Education VIP Wall of Fame
+            Testimonial from the Cloud Education team
           </h2>
           <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-            Behind every great PDF tool is a team of education professionals who generate an unreasonable amount of PDFs. These are the people who stress-tested this tool before you ever clicked a button — and the reason half these features exist.
+            Behind every great PDF tool is a team of education professionals who generate an unreasonable amount of PDFs. The Cloud Education team stress-tested this tool before you ever clicked a button — and they&apos;re the reason half these features exist.
           </p>
-          <ul className="space-y-5 text-gray-700 dark:text-gray-300">
-            <li className="flex gap-3 rounded-lg border border-border bg-white/50 py-4 pl-4 pr-4 dark:border-gray-700 dark:bg-gray-800/50">
-              <span className="text-2xl shrink-0" aria-hidden>🏆</span>
-              <div className="min-w-0 space-y-1">
-                <span className="font-semibold text-gray-900 dark:text-white">Oshin Oli</span>
-                <span className="text-gray-600 dark:text-gray-400"> — Senior Education Counsellor &amp; Migration Advisor.</span>
-                <p className="text-[15px] leading-relaxed">
-                  The OO herself. Chief PDF Complainer. Head of Quality Assurance (unofficial). The reason this website exists and the reason I eat well. Every feature request she makes comes with an implied threat to dinner.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3 rounded-lg border border-border bg-white/50 py-4 pl-4 pr-4 dark:border-gray-700 dark:bg-gray-800/50">
-              <span className="text-2xl shrink-0" aria-hidden>🏆</span>
-              <div className="min-w-0 space-y-1">
-                <span className="font-semibold text-gray-900 dark:text-white">Saksham Subedi</span>
-                <span className="text-gray-600 dark:text-gray-400"> — Co-Founder &amp; COO, Cloud Education Group.</span>
-                <p className="text-[15px] leading-relaxed">
-                  The man running the ship that generates the PDFs that broke my wife&apos;s spirit that led to this website. In a way, this is all his fault. Thank you, Saksham.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3 rounded-lg border border-border bg-white/50 py-4 pl-4 pr-4 dark:border-gray-700 dark:bg-gray-800/50">
-              <span className="text-2xl shrink-0" aria-hidden>🏆</span>
-              <div className="min-w-0 space-y-1">
-                <span className="font-semibold text-gray-900 dark:text-white">Sangam Subedi</span>
-                <span className="text-gray-600 dark:text-gray-400"> — Qualified Education Agent Counsellor (QEAC 13566), Cloud Education.</span>
-                <p className="text-[15px] leading-relaxed">
-                  Another Subedi in the game. At this point I&apos;m convinced the Subedis have a monopoly on education consulting. Sangam, if you&apos;re reading this — you&apos;re welcome for the free PDF merges.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3 rounded-lg border border-border bg-white/50 py-4 pl-4 pr-4 dark:border-gray-700 dark:bg-gray-800/50">
-              <span className="text-2xl shrink-0" aria-hidden>🏆</span>
-              <div className="min-w-0 space-y-1">
-                <span className="font-semibold text-gray-900 dark:text-white">Shreesham Shrestha</span>
-                <span className="text-gray-600 dark:text-gray-400"> — Senior Business Development Manager, Cloud Education.</span>
-                <p className="text-[15px] leading-relaxed">
-                  The man developing business so fast, the PDFs can&apos;t keep up. Shreesham generates paperwork at a pace that would make a government office jealous.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3 rounded-lg border border-border bg-white/50 py-4 pl-4 pr-4 dark:border-gray-700 dark:bg-gray-800/50">
-              <span className="text-2xl shrink-0" aria-hidden>🏆</span>
-              <div className="min-w-0 space-y-1">
-                <span className="font-semibold text-gray-900 dark:text-white">Amita Baniya</span>
-                <span className="text-gray-600 dark:text-gray-400"> — Onshore Visa &amp; Admission Coordinator.</span>
-                <p className="text-[15px] leading-relaxed">
-                  If your visa got processed and your documents were in order, there&apos;s a chance Amita merged them here first. Open to work and absolutely cracked at document wrangling.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3 rounded-lg border border-border bg-amber-50/80 py-4 pl-4 pr-4 dark:border-amber-700/40 dark:bg-amber-950/30">
-              <span className="text-2xl shrink-0" aria-hidden>🏆</span>
-              <div className="min-w-0 space-y-1">
-                <span className="font-semibold text-gray-900 dark:text-white">MARA dai</span>
-                <span className="text-gray-600 dark:text-gray-400"> — Migration Agents Registration Authority.</span>
-                <p className="text-[15px] leading-relaxed">
-                  The final boss. The one they all answer to. You don&apos;t merge PDFs for MARA dai — you merge PDFs because of MARA dai. Respect the dai. 🙏
-                </p>
-              </div>
-            </li>
-          </ul>
+          <blockquote className="rounded-lg border border-border bg-white/50 py-4 pl-4 pr-4 dark:border-gray-700 dark:bg-gray-800/50">
+            <p className="text-[15px] leading-relaxed text-gray-800 dark:text-gray-200">
+              &ldquo;We process dozens of student PDFs every day. PleaseFixMyPDF is the only tool that stays fast and doesn&apos;t send files anywhere.&rdquo;
+            </p>
+            <cite className="mt-2 block text-sm not-italic text-gray-600 dark:text-gray-400">
+              — Cloud Education team
+            </cite>
+          </blockquote>
         </section>
 
         <footer className="border-t border-border pt-8 text-center dark:border-gray-700">

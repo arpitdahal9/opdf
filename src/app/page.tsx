@@ -243,7 +243,7 @@ export default function HomePage() {
               &ldquo;We process dozens of student PDFs every day. PleaseFixMyPDF is the only tool that stays fast and
               doesn&apos;t send files anywhere.&rdquo;
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Education counsellor, Cloud Education</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Cloud Education team</p>
           </div>
           <div className="rounded-lg border border-border bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:bg-gray-900 dark:text-gray-300">
             <p>

@@ -28,7 +28,7 @@ const faqs = [
   {
     question: "Is PDF to JPG conversion free?",
     answer:
-      "Yes. PleaseFixMyPDF converts PDF pages to JPG in your browser. No upload and no signup required.",
+      "Yes. PleaseFixMyPDF converts PDF pages to JPG in your browser without uploading files to any server.",
   },
   {
     question: "Do my files get uploaded to a server?",
