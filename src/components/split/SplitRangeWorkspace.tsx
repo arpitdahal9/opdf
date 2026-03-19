@@ -104,12 +104,12 @@ function RangePreview({
 
 export function SplitRangeWorkspace() {
   const [document, setDocument] = useState<PdfDocumentState | null>(null);
-  const [tab, setTab] = useState<SplitTab>("range");
+  const [tab, setTab] = useState<SplitTab>("pages");
   const [mode, setMode] = useState<SplitMode>("custom");
   const [customRanges, setCustomRanges] = useState<PageRange[]>([]);
   const [mergeAll, setMergeAll] = useState(false);
   const [fixedSize, setFixedSize] = useState<number>(4);
-  const [extractMode, setExtractMode] = useState<ExtractMode>("all");
+  const [extractMode, setExtractMode] = useState<ExtractMode>("select");
   const [selectedPages, setSelectedPages] = useState<Set<number>>(new Set());
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,8 +120,8 @@ export function SplitRangeWorkspace() {
     if (!document) return;
     setCustomRanges([makeDefaultRange(document.pageCount)]);
     setSelectedPages(new Set());
-    setExtractMode("all");
-    setTab("range");
+    setExtractMode("select");
+    setTab("pages");
   }, [document]);
 
   const ranges = useMemo(() => {
