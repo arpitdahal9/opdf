@@ -3,25 +3,30 @@
 import { useState } from "react";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
+import { ProcessingResultStats } from "@/components/shared/ProcessingResultStats";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import { compressPdf, type CompressionLevel } from "@/lib/pdf/compressPdf";
-import { downloadPDF, formatFileSize, getFriendlyPdfError } from "@/lib/utils";
+import { downloadPDF, getFriendlyPdfError } from "@/lib/utils";
 
 export function CompressWorkspace() {
   const [file, setFile] = useState<File | null>(null);
   const [originalSize, setOriginalSize] = useState<number | null>(null);
   const [resultSize, setResultSize] = useState<number | null>(null);
+  const [pageCount, setPageCount] = useState<number | null>(null);
   const [compressionLevel, setCompressionLevel] = useState<CompressionLevel>("high");
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
+  const [processingTimeMs, setProcessingTimeMs] = useState<number | null>(null);
 
   const handleFilesSelected = (files: File[]) => {
     const nextFile = files[0];
     setFile(nextFile);
     setOriginalSize(nextFile.size);
     setResultSize(null);
+    setPageCount(null);
+    setProcessingTimeMs(null);
     setNote(null);
     setProgress(null);
     setError(null);
@@ -34,6 +39,9 @@ export function CompressWorkspace() {
     setResultSize(null);
     setNote(null);
     setProgress(null);
+    setProcessingTimeMs(null);
+
+    const startMs = performance.now();
 
     try {
       const arrayBuffer = await file.arrayBuffer();
@@ -43,6 +51,7 @@ export function CompressWorkspace() {
         onProgress: (current, total) => {
           const percent = Math.round((current / total) * 100);
           setProgress(percent);
+          setPageCount((prev) => prev ?? total);
         },
       });
 
@@ -71,6 +80,8 @@ export function CompressWorkspace() {
           : "compressed.pdf";
         downloadPDF(result.data, filename);
       }
+
+      setProcessingTimeMs(performance.now() - startMs);
     } catch (err) {
       setError(getFriendlyPdfError(err));
     } finally {
@@ -79,11 +90,9 @@ export function CompressWorkspace() {
     }
   };
 
-  const beforeSize = originalSize ?? 0;
-  const afterSize = resultSize ?? 0;
-  const reduction =
-    beforeSize && afterSize && afterSize < beforeSize
-      ? Math.round(((beforeSize - afterSize) / beforeSize) * 100)
+  const reductionPercent =
+    originalSize != null && resultSize != null && resultSize < originalSize
+      ? Math.round(((originalSize - resultSize) / originalSize) * 100)
       : null;
 
   return (
@@ -123,6 +132,7 @@ export function CompressWorkspace() {
         accept="application/pdf"
         label="Drop PDF here or click to browse"
         helperText="Upload a single PDF up to 100 MB."
+        showProBatchHint
       />
 
       {error ? (
@@ -143,21 +153,15 @@ export function CompressWorkspace() {
         />
       ) : null}
 
-      {beforeSize ? (
-        <div className="glass-panel flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
-          <div className="space-y-1">
-            <p className="font-semibold text-white">File size</p>
-            <p className="text-ink-muted">
-              Original: {formatFileSize(beforeSize)}
-              {afterSize ? ` · Compressed: ${formatFileSize(afterSize)}` : null}
-            </p>
-          </div>
-          {reduction !== null && (
-            <p className="text-sm font-semibold text-emerald-400">
-              Reduced by {reduction}%.
-            </p>
-          )}
-        </div>
+      {resultSize != null ? (
+        <ProcessingResultStats
+          beforeSize={originalSize}
+          afterSize={resultSize}
+          afterLabel="Compressed"
+          pageCount={pageCount}
+          processingTimeMs={processingTimeMs}
+          reductionPercent={reductionPercent}
+        />
       ) : null}
 
       <div className="flex justify-end">

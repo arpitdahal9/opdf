@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { SplitWorkspace } from "@/components/split/SplitWorkspace";
+import { SplitRangeWorkspace } from "@/components/split/SplitRangeWorkspace";
 import { BreadcrumbSchema } from "@/components/shared/BreadcrumbSchema";
 import { FAQSection } from "@/components/shared/FAQSection";
 import { RelatedTools } from "@/components/shared/RelatedTools";
@@ -47,7 +47,6 @@ const splitFaq = [
 
 const relatedTools = [
   { href: "/merge", label: "Merge PDF" },
-  { href: "/rotate", label: "Rotate PDF" },
   { href: "/reorder", label: "Reorder PDF" },
 ];
 
@@ -73,7 +72,7 @@ export default function SplitPage() {
   return (
     <>
       <BreadcrumbSchema items={breadcrumbs} />
-      <SplitWorkspace />
+      <SplitRangeWorkspace />
       <div className="page-wrap mx-auto max-w-4xl space-y-10 px-4 pb-12">
         <FAQSection items={splitFaq} />
         <RelatedTools tools={relatedTools} />

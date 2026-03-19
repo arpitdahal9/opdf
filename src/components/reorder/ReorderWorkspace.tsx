@@ -17,6 +17,7 @@ import { useMemo, useState } from "react";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
 import { PageThumbnail } from "@/components/shared/PageThumbnail";
+import { ProcessingResultStats } from "@/components/shared/ProcessingResultStats";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import { reorderPDF } from "@/lib/pdf/reorder";
 import { buildPageFilename, downloadPDF, getFriendlyPdfError, loadPdfFile } from "@/lib/utils";
@@ -78,13 +79,30 @@ function SortablePage({
   );
 }
 
-export function ReorderWorkspace() {
+export function ReorderWorkspace({
+  title,
+  description,
+}: {
+  title?: string;
+  description?: string;
+} = {}) {
+  const heading = title ?? "Reorder PDF Pages";
+  const helperText =
+    description ??
+    "Drag pages into a new sequence, reset if needed, and download a reordered PDF when you are happy.";
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const [document, setDocument] = useState<PdfDocumentState | null>(null);
   const [order, setOrder] = useState<number[]>([]);
   const [activePage, setActivePage] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reorderStats, setReorderStats] = useState<{
+    beforeSize: number;
+    afterSize: number;
+    pageCount: number;
+    processingTimeMs: number;
+    reductionPercent: number | null;
+  } | null>(null);
 
   const hasChanges = useMemo(() => order.some((pageIndex, index) => pageIndex !== index), [order]);
 
@@ -93,6 +111,7 @@ export function ReorderWorkspace() {
       const nextDocument = await loadPdfFile(files[0]);
       setDocument(nextDocument);
       setOrder(Array.from({ length: nextDocument.pageCount }, (_, index) => index));
+      setReorderStats(null);
       setError(null);
     } catch (err) {
       setError(getFriendlyPdfError(err));
@@ -121,8 +140,24 @@ export function ReorderWorkspace() {
     if (!document) return;
     setProcessing(true);
     setError(null);
+    setReorderStats(null);
+
+    const beforeSize = document.size;
+    const pageCount = document.pageCount;
+    const startMs = performance.now();
     try {
       const output = await reorderPDF(document.bytes, order);
+      const afterSize = output.byteLength;
+      const reductionPercent =
+        afterSize < beforeSize ? Math.round(((beforeSize - afterSize) / beforeSize) * 100) : null;
+
+      setReorderStats({
+        beforeSize,
+        afterSize,
+        pageCount,
+        processingTimeMs: performance.now() - startMs,
+        reductionPercent,
+      });
       downloadPDF(output, buildPageFilename(document.baseName, "reordered"));
     } catch (err) {
       setError(getFriendlyPdfError(err));
@@ -138,14 +173,12 @@ export function ReorderWorkspace() {
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Reorder PDF Pages</h1>
-        <p className="max-w-2xl text-ink-muted dark:text-slate-300">
-          Drag pages into a new sequence, reset if needed, and download a reordered PDF when you are happy.
-        </p>
+        <h1 className="text-3xl font-bold">{heading}</h1>
+        <p className="max-w-2xl text-ink-muted dark:text-slate-300">{helperText}</p>
       </section>
 
       {!document ? (
-        <FileDropzone multiple={false} onFilesSelected={handleFile} />
+        <FileDropzone multiple={false} onFilesSelected={handleFile} showProBatchHint />
       ) : (
         <div className="card-surface flex flex-wrap items-center justify-between gap-4 p-5">
           <div>
@@ -160,6 +193,7 @@ export function ReorderWorkspace() {
             onClick={() => {
               setDocument(null);
               setOrder([]);
+              setReorderStats(null);
               setError(null);
             }}
           >
@@ -237,6 +271,17 @@ export function ReorderWorkspace() {
             </DragOverlay>
           </DndContext>
         </>
+      ) : null}
+
+      {reorderStats ? (
+        <ProcessingResultStats
+          beforeSize={reorderStats.beforeSize}
+          afterSize={reorderStats.afterSize}
+          afterLabel="Reordered"
+          pageCount={reorderStats.pageCount}
+          processingTimeMs={reorderStats.processingTimeMs}
+          reductionPercent={reorderStats.reductionPercent}
+        />
       ) : null}
 
       {processing ? <ProcessingSpinner label="Saving new page order..." /> : null}

@@ -35,6 +35,7 @@ export function PdfFileSizeCheckerTool() {
         accept="application/pdf"
         onFilesSelected={handleFile}
         helperText="Select a PDF to check its file size."
+        showProBatchHint
       />
 
       {result ? (

@@ -134,6 +134,7 @@ export function ConvertWorkspace({ fixedMode, title, description }: ConvertWorks
             ? "Upload a .docx Word document (max 100 MB)."
             : "Upload a PDF document to extract its text into a .docx file."
         }
+        showProBatchHint
       />
 
       {fileInfo ? (

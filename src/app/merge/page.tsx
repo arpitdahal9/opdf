@@ -51,9 +51,8 @@ const mergeFaq = [
 ];
 
 const relatedTools = [
-  { href: "/reorder", label: "Reorder PDF" },
-  { href: "/split", label: "Split PDF" },
   { href: "/compress", label: "Compress PDF" },
+  { href: "/sign-pdf", label: "Sign PDF" },
 ];
 
 const breadcrumbs = [

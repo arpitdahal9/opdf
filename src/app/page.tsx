@@ -17,6 +17,7 @@ import Link from "next/link";
 const LOGO_URL = "/logo.png";
 
 import { ToolCard } from "@/components/shared/ToolCard";
+import { allBlogPosts } from "@/lib/blog";
 
 const tools = [
   {
@@ -267,6 +268,27 @@ export default function HomePage() {
             <ToolCard key={tool.href} {...tool} />
           ))}
         </div>
+
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Guides & tips</h2>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              Learn step-by-step workflows for merging, compressing, splitting, and converting PDFs.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {allBlogPosts.slice(0, 3).map((post) => (
+              <Link
+                key={post.slug}
+                href={`/blog/${post.slug}`}
+                className="block rounded-xl border border-border bg-white p-4 transition-shadow hover:shadow-md dark:bg-gray-900 dark:border-gray-700"
+              >
+                <h3 className="font-semibold text-gray-900 dark:text-white">{post.h1}</h3>
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{post.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
       </section>
 
       {/* All in one + Privacy + Benefits */}

@@ -18,6 +18,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { t } from "@/lib/i18n";
+import { useLanguage } from "@/lib/language";
+
 const redLinkHrefs = new Set(["/split", "/reorder", "/pdf-to-word", "/compress"]);
 const blueLinkHrefs = new Set(["/merge", "/rotate", "/word-to-pdf", "/image-to-pdf"]);
 
@@ -97,7 +100,7 @@ function Dropdown({
   open,
   onEnter,
   onLeave,
-  dropdownId,
+  sectionLabel,
 }: {
   label: string;
   items: { href: string; label: string; icon: LucideIcon }[];
@@ -105,7 +108,7 @@ function Dropdown({
   open: boolean;
   onEnter: () => void;
   onLeave: () => void;
-  dropdownId: "tools" | "converter";
+  sectionLabel: string;
 }) {
   return (
     <div
@@ -141,7 +144,7 @@ function Dropdown({
         >
           <div className="px-2.5 pb-1.5 pt-1">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              {dropdownId === "tools" ? "Edit & organize" : "Convert & compress"}
+              {sectionLabel}
             </p>
           </div>
           <div className="space-y-0.5 px-2">
@@ -163,6 +166,7 @@ function Dropdown({
 
 export function Navbar() {
   const pathname = usePathname();
+  const lang = useLanguage();
   const [openDropdown, setOpenDropdown] = useState<"tools" | "converter" | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -203,22 +207,22 @@ export function Navbar() {
         <span className="min-w-0 flex-1 lg:hidden" aria-hidden />
         <nav className="hidden lg:flex min-w-0 flex-1 flex-nowrap items-center justify-end gap-1 overflow-visible">
           <Dropdown
-            label="PDF Tools"
+            label={t(lang, "pdfTools")}
             items={pdfTools}
             pathname={pathname}
             open={openDropdown === "tools"}
             onEnter={() => setOpenDropdown("tools")}
             onLeave={() => setOpenDropdown(null)}
-            dropdownId="tools"
+            sectionLabel={t(lang, "editAndOrganize")}
           />
           <Dropdown
-            label="PDF Converter"
+            label={t(lang, "pdfConverter")}
             items={pdfConverter}
             pathname={pathname}
             open={openDropdown === "converter"}
             onEnter={() => setOpenDropdown("converter")}
             onLeave={() => setOpenDropdown(null)}
-            dropdownId="converter"
+            sectionLabel={t(lang, "convertAndCompress")}
           />
         </nav>
         <div className="flex shrink-0 items-center gap-1">
@@ -226,31 +230,31 @@ export function Navbar() {
             href="/pricing"
             className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            Pricing
+            {t(lang, "pricing")}
           </Link>
           <Link
             href="/about"
             className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            About
+            {t(lang, "about")}
           </Link>
           <Link
             href="/tools"
             className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            All tools
+            {t(lang, "allTools")}
           </Link>
           <Link
             href="/login"
             className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            Log in
+            {t(lang, "login")}
           </Link>
           <Link
             href="/signup"
             className="hidden lg:inline-block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-white bg-primary hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            Sign up
+            {t(lang, "signup")}
           </Link>
           <button
             type="button"
@@ -282,7 +286,7 @@ export function Navbar() {
           <div className="flex flex-col h-full">
             <div className="flex items-center justify-between border-b border-border px-4 py-3 dark:border-gray-700">
               <span className="font-display text-lg font-semibold text-gray-900 dark:text-white">
-                Menu
+                {t(lang, "menu")}
               </span>
               <button
                 type="button"
@@ -296,7 +300,7 @@ export function Navbar() {
             <nav className="flex-1 overflow-y-auto py-4">
               <div className="px-2 space-y-1">
                 <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  PDF Tools
+                  {t(lang, "pdfTools")}
                 </p>
                 {pdfTools.map((item) => (
                   <DropdownItem
@@ -311,7 +315,7 @@ export function Navbar() {
               </div>
               <div className="mt-4 px-2 space-y-1">
                 <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  PDF Converter
+                  {t(lang, "pdfConverter")}
                 </p>
                 {pdfConverter.map((item) => (
                   <DropdownItem
@@ -330,35 +334,35 @@ export function Navbar() {
                   onClick={closeMobileMenu}
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
-                  Pricing
+                  {t(lang, "pricing")}
                 </Link>
                 <Link
                   href="/about"
                   onClick={closeMobileMenu}
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
-                  About
+                  {t(lang, "about")}
                 </Link>
                 <Link
                   href="/tools"
                   onClick={closeMobileMenu}
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
-                  All tools
+                  {t(lang, "allTools")}
                 </Link>
                 <Link
                   href="/login"
                   onClick={closeMobileMenu}
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
-                  Log in
+                  {t(lang, "login")}
                 </Link>
                 <Link
                   href="/signup"
                   onClick={closeMobileMenu}
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
-                  Sign up
+                  {t(lang, "signup")}
                 </Link>
               </div>
             </nav>

@@ -40,6 +40,15 @@ export function formatFileSize(bytes: number) {
   return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
+export function formatDurationMs(ms: number) {
+  if (!Number.isFinite(ms) || ms < 0) return "—";
+  if (ms < 1000) return `${Math.round(ms)} ms`;
+
+  const seconds = ms / 1000;
+  if (seconds < 10) return `${seconds.toFixed(1)} s`;
+  return `${Math.round(seconds)} s`;
+}
+
 export function downloadPDF(pdfBytes: Uint8Array, filename: string) {
   const arrayBuffer = pdfBytes.buffer.slice(
     pdfBytes.byteOffset,
@@ -84,6 +93,15 @@ export function downloadBytes(bytes: Uint8Array, filename: string, mimeType: str
     bytes.byteOffset + bytes.byteLength,
   ) as ArrayBuffer;
   const blob = new Blob([arrayBuffer], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;

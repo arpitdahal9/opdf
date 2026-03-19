@@ -59,6 +59,7 @@ export function PdfMetadataViewerTool() {
         accept="application/pdf"
         onFilesSelected={handleFile}
         helperText="Select a PDF to view its metadata and properties."
+        showProBatchHint
       />
 
       {result ? (

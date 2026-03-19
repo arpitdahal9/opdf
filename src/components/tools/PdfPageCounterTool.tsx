@@ -37,6 +37,7 @@ export function PdfPageCounterTool() {
         accept="application/pdf"
         onFilesSelected={handleFile}
         helperText="Select a PDF to count its pages."
+        showProBatchHint
       />
 
       {result ? (

@@ -149,4 +149,12 @@ export const alternativePaths = ["/alternatives/ilovepdf-alternatives"];
 export const audiencePaths = ["/for/students", "/for/legal", "/for/healthcare"];
 
 /** Static routes that are not tools or conversions. */
-export const staticRoutes = ["", "/converter", "/about", "/pricing"];
+export const staticRoutes = [
+  "",
+  "/converter",
+  "/about",
+  "/pricing",
+  "/delete-pdf-pages",
+  "/extract-pdf-pages",
+  "/organize-pdf",
+];

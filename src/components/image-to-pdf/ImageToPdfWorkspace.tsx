@@ -182,6 +182,7 @@ export function ImageToPdfWorkspace() {
         accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
         label="Drop images here or click to browse"
         helperText="Upload JPG, PNG, WebP, or GIF images (up to 100 MB each). They will become pages in your PDF."
+        showProBatchHint
       />
 
       {processing ? <ProcessingSpinner label="Creating PDF from images..." /> : null}

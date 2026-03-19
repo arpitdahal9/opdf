@@ -53,11 +53,57 @@ export default async function BlogPostPage({ params }: Props) {
         </header>
 
         <div className="prose prose-gray dark:prose-invert max-w-none">
-          {post.body.map((paragraph, i) => (
-            <p key={i} className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              {paragraph}
-            </p>
-          ))}
+          {post.body.map((block, i) => {
+            const trimmed = block.trim();
+            const key = `${post.slug}-block-${i}`;
+
+            const h2Prefix = "## ";
+            const h3Prefix = "### ";
+            const h4Prefix = "#### ";
+
+            if (trimmed.startsWith(h2Prefix)) {
+              return (
+                <h2 key={key} className="mt-8 text-xl font-bold text-gray-900 dark:text-white">
+                  {trimmed.slice(h2Prefix.length)}
+                </h2>
+              );
+            }
+
+            if (trimmed.startsWith(h3Prefix)) {
+              return (
+                <h3 key={key} className="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
+                  {trimmed.slice(h3Prefix.length)}
+                </h3>
+              );
+            }
+
+            if (trimmed.startsWith(h4Prefix)) {
+              return (
+                <h4 key={key} className="mt-5 text-base font-semibold text-gray-900 dark:text-white">
+                  {trimmed.slice(h4Prefix.length)}
+                </h4>
+              );
+            }
+
+            if (trimmed.startsWith("[[Screenshot:") && trimmed.endsWith("]]")) {
+              const label = trimmed.replace("[[Screenshot:", "").replace("]]", "").trim();
+              return (
+                <div
+                  key={key}
+                  className="my-6 rounded-xl border border-border bg-muted/30 p-4 text-sm text-gray-700 dark:bg-muted/10 dark:text-gray-200"
+                >
+                  <p className="font-semibold text-gray-900 dark:text-white">Screenshot</p>
+                  <p className="mt-1 text-gray-600 dark:text-gray-400">{label}</p>
+                </div>
+              );
+            }
+
+            return (
+              <p key={key} className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                {block}
+              </p>
+            );
+          })}
         </div>
 
         <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 dark:bg-primary/10">
@@ -77,6 +123,23 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
 
         <FAQSection items={faqItems} />
+        {post.relatedBlogLinks?.length ? (
+          <div className="rounded-xl border border-border bg-white p-4 dark:bg-gray-900 dark:border-gray-700">
+            <p className="font-medium text-gray-900 dark:text-white mb-2">Related guides</p>
+            <ul className="flex flex-wrap gap-3">
+              {post.relatedBlogLinks.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className="text-primary font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                  >
+                    {l.label} →
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         <RelatedTools tools={post.toolLinks} />
       </article>
     </>

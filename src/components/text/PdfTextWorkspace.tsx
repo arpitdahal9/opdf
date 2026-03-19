@@ -165,6 +165,7 @@ export function PdfTextWorkspace() {
             accept="application/pdf"
             onFilesSelected={handlePdfSelected}
             helperText="Drop a PDF here or click to choose one. We'll extract the text in your browser."
+            showProBatchHint
           />
           {error ? (
             <div className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">

@@ -130,6 +130,7 @@ export function PdfToImageWorkspace() {
           accept="application/pdf"
           onFilesSelected={handleFile}
           helperText="Select a PDF to convert its pages to JPG images."
+        showProBatchHint
         />
       </div>
     );
@@ -215,6 +216,7 @@ export function PdfToImageWorkspace() {
         accept="application/pdf"
         onFilesSelected={handleFile}
         helperText="Choose another PDF to convert."
+        showProBatchHint
       />
     </div>
   );

@@ -5,9 +5,10 @@ import { PenLine, RotateCcw } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
+import { ProcessingResultStats } from "@/components/shared/ProcessingResultStats";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import { getPdfPageCount, renderPdfPageToImage } from "@/lib/pdf/pdfToImage";
-import { downloadPDF, fileToUint8Array, getFriendlyPdfError } from "@/lib/utils";
+import { downloadPDF, fileToUint8Array, formatFileSize, getFriendlyPdfError } from "@/lib/utils";
 
 function dataUrlToUint8Array(dataUrl: string): Uint8Array {
   const base64 = dataUrl.split(",")[1] ?? "";
@@ -35,10 +36,20 @@ export function SignPdfWorkspace() {
   const [pdfBytes, setPdfBytes] = useState<Uint8Array | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [pagePreviews, setPagePreviews] = useState<PagePreview[]>([]);
-  const [processing, setProcessing] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [signProcessing, setSignProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSignature, setHasSignature] = useState(false);
   const [placements, setPlacements] = useState<ClickPlacement[]>([]);
+  const [pdfPageCount, setPdfPageCount] = useState<number | null>(null);
+  const [originalSize, setOriginalSize] = useState<number | null>(null);
+  const [signStats, setSignStats] = useState<{
+    beforeSize: number;
+    afterSize: number;
+    pageCount: number;
+    processingTimeMs: number;
+    reductionPercent: number | null;
+  } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const drawing = useRef(false);
 
@@ -66,8 +77,11 @@ export function SignPdfWorkspace() {
   const handleFilesSelected = async (files: File[]) => {
     const file = files[0];
     if (!file) return;
-    setProcessing(true);
+    setPreviewLoading(true);
     setError(null);
+    setSignStats(null);
+    setPdfPageCount(null);
+    setOriginalSize(null);
     setPagePreviews([]);
     setPdfBytes(null);
     setPlacements([]);
@@ -76,8 +90,10 @@ export function SignPdfWorkspace() {
       const bytes = await fileToUint8Array(file);
       setPdfBytes(bytes);
       setFileName(file.name);
+      setOriginalSize(file.size);
       // Generate thumbnails for all pages so users can click exactly where they want to sign.
       const pageCount = await getPdfPageCount(bytes);
+      setPdfPageCount(pageCount);
       const previews: PagePreview[] = [];
       for (let pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
         // Use a slightly lower scale for faster, smaller thumbnails.
@@ -89,7 +105,7 @@ export function SignPdfWorkspace() {
     } catch (err) {
       setError(getFriendlyPdfError(err));
     } finally {
-      setProcessing(false);
+      setPreviewLoading(false);
     }
   };
 
@@ -150,8 +166,11 @@ export function SignPdfWorkspace() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    setProcessing(true);
+    setSignProcessing(true);
     setError(null);
+    setSignStats(null);
+    const beforeSize = originalSize ?? pdfBytes.byteLength;
+    const startMs = performance.now();
 
     try {
       const dataUrl = canvas.toDataURL("image/png");
@@ -197,12 +216,24 @@ export function SignPdfWorkspace() {
       }
 
       const signedBytes = await pdf.save();
+      const afterSize = signedBytes.byteLength;
+      const pageCount = pdf.getPageCount();
+      const reductionPercent =
+        afterSize < beforeSize ? Math.round(((beforeSize - afterSize) / beforeSize) * 100) : null;
+
+      setSignStats({
+        beforeSize,
+        afterSize,
+        pageCount,
+        processingTimeMs: performance.now() - startMs,
+        reductionPercent,
+      });
       const base = fileName?.replace(/\.pdf$/i, "") || "signed";
       downloadPDF(signedBytes, `${base}_signed.pdf`);
     } catch (err) {
       setError(getFriendlyPdfError(err));
     } finally {
-      setProcessing(false);
+      setSignProcessing(false);
     }
   };
 
@@ -222,11 +253,19 @@ export function SignPdfWorkspace() {
           accept="application/pdf"
           onFilesSelected={handleFilesSelected}
           helperText="Drop a PDF here or click to choose one."
+          showProBatchHint
         />
         {fileName ? (
-          <p className="text-xs text-ink-muted dark:text-slate-300 truncate">
-            Selected: <span className="font-medium">{fileName}</span>
-          </p>
+          <div className="space-y-1">
+            <p className="text-xs text-ink-muted dark:text-slate-300 truncate">
+              Selected: <span className="font-medium">{fileName}</span>
+            </p>
+            {originalSize != null && pdfPageCount != null ? (
+              <p className="text-xs text-ink-muted dark:text-slate-300">
+                {formatFileSize(originalSize)} · {pdfPageCount} page{pdfPageCount === 1 ? "" : "s"}
+              </p>
+            ) : null}
+          </div>
         ) : null}
         <p className="text-xs text-ink-muted dark:text-slate-400">
           After uploading, click on any page thumbnail to choose exactly where your signature should go. You can add it
@@ -332,7 +371,7 @@ export function SignPdfWorkspace() {
             <button
               type="button"
               className="primary-button"
-              disabled={!pdfBytes || !hasSignature || processing}
+              disabled={!pdfBytes || !hasSignature || signProcessing}
               onClick={() => void handleSignPdf()}
             >
               <PenLine className="mr-2 h-4 w-4" />
@@ -348,7 +387,22 @@ export function SignPdfWorkspace() {
         </div>
       ) : null}
 
-      {processing ? <ProcessingSpinner label="Applying signature to your PDF..." /> : null}
+      {signStats ? (
+        <ProcessingResultStats
+          beforeSize={signStats.beforeSize}
+          afterSize={signStats.afterSize}
+          afterLabel="Signed"
+          pageCount={signStats.pageCount}
+          processingTimeMs={signStats.processingTimeMs}
+          reductionPercent={signStats.reductionPercent}
+        />
+      ) : null}
+
+      {previewLoading ? (
+        <ProcessingSpinner label="Loading your PDF and generating previews..." />
+      ) : null}
+
+      {signProcessing ? <ProcessingSpinner label="Applying signature to your PDF..." /> : null}
     </div>
   );
 }

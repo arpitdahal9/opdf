@@ -17,6 +17,7 @@ import { useMemo, useState } from "react";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
 import { PageThumbnail } from "@/components/shared/PageThumbnail";
+import { ProcessingResultStats } from "@/components/shared/ProcessingResultStats";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import {
   resetPageItemRotations,
@@ -109,7 +110,8 @@ function SortableSplitPage({
   );
 }
 
-export function SplitWorkspace() {
+export function SplitWorkspace({ variant }: { variant?: "extract" | "delete" } = {}) {
+  const isDeleteVariant = variant === "delete";
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const [document, setDocument] = useState<PdfDocumentState | null>(null);
   const [pageItems, setPageItems] = useState<PdfPageItem[]>([]);
@@ -119,6 +121,13 @@ export function SplitWorkspace() {
   const [activePageId, setActivePageId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [splitStats, setSplitStats] = useState<{
+    beforeSize: number;
+    afterSize: number;
+    pageCount: number;
+    processingTimeMs: number;
+    reductionPercent: number | null;
+  } | null>(null);
 
   const rangeState = useMemo(() => {
     if (!pageItems.length) {
@@ -144,24 +153,26 @@ export function SplitWorkspace() {
     setSelectedPageIds([]);
     setRangeInput("");
     setError(null);
+    setSplitStats(null);
   };
 
   const handleFile = async (files: File[]) => {
     try {
       const nextDocument = await loadPdfFile(files[0]);
       setDocument(nextDocument);
-      setPageItems(
-        Array.from({ length: nextDocument.pageCount }, (_, index) => ({
-          id: randomUUID(),
-          sourceFileId: nextDocument.id,
-          sourceFileName: nextDocument.name,
-          sourceBaseName: nextDocument.baseName,
-          sourcePageIndex: index,
-          sourceBytes: nextDocument.bytes,
-          rotation: 0,
-        })),
-      );
-      setSelectedPageIds([]);
+      setSplitStats(null);
+      const nextPageItems = Array.from({ length: nextDocument.pageCount }, (_, index) => ({
+        id: randomUUID(),
+        sourceFileId: nextDocument.id,
+        sourceFileName: nextDocument.name,
+        sourceBaseName: nextDocument.baseName,
+        sourcePageIndex: index,
+        sourceBytes: nextDocument.bytes,
+        rotation: 0,
+      }));
+      setPageItems(nextPageItems);
+      setSelectedPageIds(isDeleteVariant ? nextPageItems.map((item) => item.id) : []);
+      setMode("select");
       setRangeInput("");
       setError(null);
     } catch (err) {
@@ -176,8 +187,23 @@ export function SplitWorkspace() {
 
     setProcessing(true);
     setError(null);
+    setSplitStats(null);
     try {
+      const beforeSize = document.size;
+      const startMs = performance.now();
+
       const pdfBytes = await splitEditedPages(items);
+      const afterSize = pdfBytes.byteLength;
+      const reductionPercent =
+        afterSize < beforeSize ? Math.round(((beforeSize - afterSize) / beforeSize) * 100) : null;
+
+      setSplitStats({
+        beforeSize,
+        afterSize,
+        pageCount: items.length,
+        processingTimeMs: performance.now() - startMs,
+        reductionPercent,
+      });
       downloadPDF(pdfBytes, filename);
     } catch (err) {
       setError(getFriendlyPdfError(err));
@@ -212,17 +238,21 @@ export function SplitWorkspace() {
   return (
     <div className="page-wrap animate-fadeIn space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold">Split PDF Files</h1>
+        <h1 className="text-3xl font-bold">{isDeleteVariant ? "Delete PDF Pages" : "Split PDF Files"}</h1>
         <p className="max-w-2xl text-ink-muted dark:text-slate-300">
-          Select pages, enter ranges, rotate pages, and reorder the final sequence freely before downloading the extracted PDF.
+          {isDeleteVariant
+            ? "Remove the pages you don't want, then download the remaining PDF."
+            : "Select pages, enter ranges, rotate pages, and reorder the final sequence freely before downloading the extracted PDF."}
         </p>
         <p className="text-sm text-ink-muted dark:text-slate-400">
-          All in one: pick specific pages (select mode) or use page ranges (e.g. 1–5, 8).
+          {isDeleteVariant
+            ? "All in one: delete unwanted pages (click the X) and download the result."
+            : "All in one: pick specific pages (select mode) or use page ranges (e.g. 1–5, 8)."}
         </p>
       </section>
 
       {!document ? (
-        <FileDropzone multiple={false} onFilesSelected={handleFile} />
+        <FileDropzone multiple={false} onFilesSelected={handleFile} showProBatchHint />
       ) : (
         <div className="card-surface flex flex-wrap items-center justify-between gap-4 p-5">
           <div>
@@ -252,13 +282,15 @@ export function SplitWorkspace() {
                 >
                   Select Pages
                 </button>
-                <button
-                  type="button"
-                  className={mode === "range" ? "primary-button" : "secondary-button"}
-                  onClick={() => setMode("range")}
-                >
-                  Page Range
-                </button>
+                {!isDeleteVariant ? (
+                  <button
+                    type="button"
+                    className={mode === "range" ? "primary-button" : "secondary-button"}
+                    onClick={() => setMode("range")}
+                  >
+                    Page Range
+                  </button>
+                ) : null}
               </div>
               <div className="flex flex-wrap gap-3">
                 <button
@@ -288,12 +320,18 @@ export function SplitWorkspace() {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="space-y-1">
                 <h2 className="font-semibold">
-                  {mode === "select" ? "Select pages to extract" : "Extract by current positions"}
+                  {isDeleteVariant
+                    ? "Delete pages from your PDF"
+                    : mode === "select"
+                      ? "Select pages to extract"
+                      : "Extract by current positions"}
                 </h2>
                 <p className="text-sm text-ink-muted dark:text-slate-300">
-                  {mode === "select"
-                    ? "Click thumbnails to toggle pages. Reorder and rotate whenever you want."
-                    : "Ranges follow the current displayed order after any reordering."}
+                  {isDeleteVariant
+                    ? "Use the X button to remove pages you don't want. Reorder and rotate the remaining pages, then download."
+                    : mode === "select"
+                      ? "Click thumbnails to toggle pages. Reorder and rotate whenever you want."
+                      : "Ranges follow the current displayed order after any reordering."}
                 </p>
               </div>
               <button
@@ -316,32 +354,45 @@ export function SplitWorkspace() {
                   )
                 }
               >
-                Download Extracted PDF
+                {isDeleteVariant ? "Download Remaining PDF" : "Download Extracted PDF"}
               </button>
             </div>
           </div>
 
           {mode === "select" ? (
             <div className="glass-panel flex flex-wrap items-center justify-between gap-3 p-5">
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => setSelectedPageIds(pageItems.map((item) => item.id))}
-                >
-                  Select All
-                </button>
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => setSelectedPageIds([])}
-                >
-                  Deselect All
-                </button>
-              </div>
-              <div className="text-sm text-ink-muted dark:text-slate-300">
-                {selectedItems.length} page{selectedItems.length === 1 ? "" : "s"} selected
-              </div>
+              {isDeleteVariant ? (
+                <div className="space-y-1">
+                  <div className="text-sm text-ink-muted dark:text-slate-300">
+                    {selectedItems.length} page{selectedItems.length === 1 ? "" : "s"} remaining
+                  </div>
+                  <div className="text-xs text-ink-muted/80 dark:text-slate-400">
+                    Tip: click the X on any page thumbnail to remove it.
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => setSelectedPageIds(pageItems.map((item) => item.id))}
+                    >
+                      Select All
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => setSelectedPageIds([])}
+                    >
+                      Deselect All
+                    </button>
+                  </div>
+                  <div className="text-sm text-ink-muted dark:text-slate-300">
+                    {selectedItems.length} page{selectedItems.length === 1 ? "" : "s"} selected
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <div className="glass-panel space-y-3 p-5">
@@ -406,6 +457,17 @@ export function SplitWorkspace() {
             </DragOverlay>
           </DndContext>
         </>
+      ) : null}
+
+      {splitStats ? (
+        <ProcessingResultStats
+          beforeSize={splitStats.beforeSize}
+          afterSize={splitStats.afterSize}
+          afterLabel="Extracted"
+          pageCount={splitStats.pageCount}
+          processingTimeMs={splitStats.processingTimeMs}
+          reductionPercent={splitStats.reductionPercent}
+        />
       ) : null}
 
       {processing ? <ProcessingSpinner label="Creating split PDF..." /> : null}

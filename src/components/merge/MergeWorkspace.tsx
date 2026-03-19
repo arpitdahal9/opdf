@@ -17,6 +17,7 @@ import { useMemo, useRef, useState } from "react";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
 import { PageThumbnail } from "@/components/shared/PageThumbnail";
+import { ProcessingResultStats } from "@/components/shared/ProcessingResultStats";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import { FileSizeLimitBanner } from "@/components/shared/FileSizeLimitBanner";
 import { UsageLimitModal } from "@/components/shared/UsageLimitModal";
@@ -133,6 +134,13 @@ export function MergeWorkspace() {
   };
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mergeStats, setMergeStats] = useState<{
+    beforeSize: number;
+    afterSize: number;
+    pageCount: number;
+    processingTimeMs: number;
+    reductionPercent: number | null;
+  } | null>(null);
 
   const groups = useMemo(() => getContiguousGroups(pageItems), [pageItems]);
   const activePage = activePageId ? pageItems.find((item) => item.id === activePageId) ?? null : null;
@@ -150,6 +158,7 @@ export function MergeWorkspace() {
 
       setFiles((current) => [...current, ...loaded]);
       setPageItems((current) => [...current, ...createPageItemsFromDocuments(loaded)]);
+      setMergeStats(null);
       setError(null);
     } catch (err) {
       setError(getFriendlyPdfError(err));
@@ -177,8 +186,24 @@ export function MergeWorkspace() {
   const handleMerge = async () => {
     setProcessing(true);
     setError(null);
+    setMergeStats(null);
     try {
+      const beforeSize = files.reduce((sum, f) => sum + f.size, 0);
+      const pageCount = pageItems.length;
+      const startMs = performance.now();
+
       const merged = await mergeEditedPages(pageItems);
+      const afterSize = merged.byteLength;
+      const reductionPercent =
+        afterSize < beforeSize ? Math.round(((beforeSize - afterSize) / beforeSize) * 100) : null;
+
+      setMergeStats({
+        beforeSize,
+        afterSize,
+        pageCount,
+        processingTimeMs: performance.now() - startMs,
+        reductionPercent,
+      });
       downloadPDF(merged, "merged.pdf");
       trackUsage("merge");
       if (hasReachedDailyLimit()) setShowUsageModal(true);
@@ -235,7 +260,7 @@ export function MergeWorkspace() {
         </div>
       </section>
 
-      {!files.length ? <FileDropzone multiple onFilesSelected={ingestFiles} /> : null}
+      {!files.length ? <FileDropzone multiple onFilesSelected={ingestFiles} showProBatchHint /> : null}
 
       {error ? (
         <div className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
@@ -455,6 +480,7 @@ export function MergeWorkspace() {
             multiple
             onFilesSelected={ingestFiles}
             helperText="Add more PDFs to keep expanding your merge canvas."
+            showProBatchHint
           />
         </section>
       ) : null}
@@ -479,6 +505,17 @@ export function MergeWorkspace() {
             </button>
           </div>
         </div>
+      ) : null}
+
+      {mergeStats ? (
+        <ProcessingResultStats
+          beforeSize={mergeStats.beforeSize}
+          afterSize={mergeStats.afterSize}
+          afterLabel="Merged"
+          pageCount={mergeStats.pageCount}
+          processingTimeMs={mergeStats.processingTimeMs}
+          reductionPercent={mergeStats.reductionPercent}
+        />
       ) : null}
 
       {processing ? <ProcessingSpinner label="Merging PDFs..." /> : null}

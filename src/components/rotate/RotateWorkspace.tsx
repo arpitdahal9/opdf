@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { FileDropzone } from "@/components/shared/FileDropzone";
 import { PageThumbnail } from "@/components/shared/PageThumbnail";
+import { ProcessingResultStats } from "@/components/shared/ProcessingResultStats";
 import { ProcessingSpinner } from "@/components/shared/ProcessingSpinner";
 import { rotatePDF } from "@/lib/pdf/rotate";
 import { buildPageFilename, downloadPDF, getFriendlyPdfError, loadPdfFile } from "@/lib/utils";
@@ -19,6 +20,13 @@ export function RotateWorkspace() {
   const [rotations, setRotations] = useState<Map<number, number>>(new Map());
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rotateStats, setRotateStats] = useState<{
+    beforeSize: number;
+    afterSize: number;
+    pageCount: number;
+    processingTimeMs: number;
+    reductionPercent: number | null;
+  } | null>(null);
 
   const hasChanges = rotations.size > 0;
 
@@ -59,6 +67,7 @@ export function RotateWorkspace() {
       const nextDocument = await loadPdfFile(files[0]);
       setDocument(nextDocument);
       setRotations(new Map());
+      setRotateStats(null);
       setError(null);
     } catch (err) {
       setError(getFriendlyPdfError(err));
@@ -72,8 +81,23 @@ export function RotateWorkspace() {
 
     setProcessing(true);
     setError(null);
+    setRotateStats(null);
+    const beforeSize = document.size;
+    const pageCount = document.pageCount;
+    const startMs = performance.now();
     try {
       const output = await rotatePDF(document.bytes, rotations);
+      const afterSize = output.byteLength;
+      const reductionPercent =
+        afterSize < beforeSize ? Math.round(((beforeSize - afterSize) / beforeSize) * 100) : null;
+
+      setRotateStats({
+        beforeSize,
+        afterSize,
+        pageCount,
+        processingTimeMs: performance.now() - startMs,
+        reductionPercent,
+      });
       downloadPDF(output, buildPageFilename(document.baseName, "rotated"));
     } catch (err) {
       setError(getFriendlyPdfError(err));
@@ -95,7 +119,7 @@ export function RotateWorkspace() {
       </section>
 
       {!document ? (
-        <FileDropzone multiple={false} onFilesSelected={handleFile} />
+        <FileDropzone multiple={false} onFilesSelected={handleFile} showProBatchHint />
       ) : (
         <div className="card-surface flex flex-wrap items-center justify-between gap-4 p-5">
           <div>
@@ -110,6 +134,7 @@ export function RotateWorkspace() {
             onClick={() => {
               setDocument(null);
               setRotations(new Map());
+              setRotateStats(null);
               setError(null);
             }}
           >
@@ -193,6 +218,17 @@ export function RotateWorkspace() {
             })}
           </div>
         </>
+      ) : null}
+
+      {rotateStats ? (
+        <ProcessingResultStats
+          beforeSize={rotateStats.beforeSize}
+          afterSize={rotateStats.afterSize}
+          afterLabel="Rotated"
+          pageCount={rotateStats.pageCount}
+          processingTimeMs={rotateStats.processingTimeMs}
+          reductionPercent={rotateStats.reductionPercent}
+        />
       ) : null}
 
       {processing ? <ProcessingSpinner label="Applying page rotations..." /> : null}

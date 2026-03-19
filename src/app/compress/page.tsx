@@ -48,8 +48,10 @@ const compressFaq = [
 
 const relatedTools = [
   { href: "/merge", label: "Merge PDF" },
-  { href: "/split", label: "Split PDF" },
-  { href: "/image-to-pdf", label: "Image to PDF" },
+  {
+    href: "mailto:?subject=Compressed%20PDF",
+    label: "Email your PDF",
+  },
 ];
 
 const breadcrumbs = [

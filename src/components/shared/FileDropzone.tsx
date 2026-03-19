@@ -13,6 +13,7 @@ export function FileDropzone({
   helperText,
   accept = "application/pdf",
   label,
+  showProBatchHint = false,
 }: {
   multiple: boolean;
   onFilesSelected: (files: File[]) => void;
@@ -20,6 +21,7 @@ export function FileDropzone({
   helperText?: string;
   accept?: string;
   label?: string;
+  showProBatchHint?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -88,6 +90,11 @@ export function FileDropzone({
           </p>
           {helperText ? (
             <p className="text-sm text-gray-500 dark:text-gray-400">{helperText}</p>
+          ) : null}
+          {showProBatchHint ? (
+            <p className="mt-2 inline-flex items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1 text-[11px] font-semibold text-primary">
+              Pro: Process multiple files at once
+            </p>
           ) : null}
         </div>
         <input
