@@ -11,7 +11,9 @@ import { splitPDF } from "@/lib/pdf/split";
 import { buildPageFilename, downloadBlob, downloadPDF, formatFileSize, getFriendlyPdfError, loadPdfFile, randomUUID } from "@/lib/utils";
 import type { PdfDocumentState } from "@/types/pdf";
 
+type SplitTab = "range" | "pages";
 type SplitMode = "custom" | "fixed";
+type ExtractMode = "all" | "select";
 
 type PageRange = {
   id: string;
@@ -102,10 +104,13 @@ function RangePreview({
 
 export function SplitRangeWorkspace() {
   const [document, setDocument] = useState<PdfDocumentState | null>(null);
+  const [tab, setTab] = useState<SplitTab>("range");
   const [mode, setMode] = useState<SplitMode>("custom");
   const [customRanges, setCustomRanges] = useState<PageRange[]>([]);
   const [mergeAll, setMergeAll] = useState(false);
   const [fixedSize, setFixedSize] = useState<number>(4);
+  const [extractMode, setExtractMode] = useState<ExtractMode>("all");
+  const [selectedPages, setSelectedPages] = useState<Set<number>>(new Set());
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -114,6 +119,9 @@ export function SplitRangeWorkspace() {
   useEffect(() => {
     if (!document) return;
     setCustomRanges([makeDefaultRange(document.pageCount)]);
+    setSelectedPages(new Set());
+    setExtractMode("all");
+    setTab("range");
   }, [document]);
 
   const ranges = useMemo(() => {
@@ -121,6 +129,23 @@ export function SplitRangeWorkspace() {
     if (mode === "fixed") return computeFixedRanges(document.pageCount, fixedSize);
     return customRanges.map((r) => normalizeRange(r, document.pageCount));
   }, [customRanges, document, fixedSize, mode]);
+
+  const selectedPageIndices = useMemo(() => {
+    if (!document) return [];
+    return Array.from(selectedPages)
+      .filter((p) => p >= 0 && p < document.pageCount)
+      .sort((a, b) => a - b);
+  }, [document, selectedPages]);
+
+  const pagesSummary = useMemo(() => {
+    if (!document) return null;
+    if (extractMode === "all") {
+      return `All ${document.pageCount} pages will be extracted as separate PDF files.`;
+    }
+    const count = selectedPageIndices.length;
+    if (!count) return "Select pages to extract.";
+    return `${count} page${count === 1 ? "" : "s"} selected. ${count} PDF${count === 1 ? "" : "s"} will be created.`;
+  }, [document, extractMode, selectedPageIndices.length]);
 
   const fixedSummary = useMemo(() => {
     if (!document) return null;
@@ -148,6 +173,29 @@ export function SplitRangeWorkspace() {
     setProcessing(true);
     setError(null);
     try {
+      if (tab === "pages") {
+        const indices = extractMode === "all" ? Array.from({ length: document.pageCount }, (_, i) => i) : selectedPageIndices;
+        if (!indices.length) throw new Error("Select at least one page.");
+
+        if (indices.length === 1) {
+          const out = await splitPDF(document.bytes, [indices[0]!]);
+          downloadPDF(out, buildPageFilename(document.baseName, `page_${indices[0]! + 1}`));
+          return;
+        }
+
+        const zip = new JSZip();
+        await Promise.all(
+          indices.map(async (pageIndex) => {
+            const out = await splitPDF(document.bytes, [pageIndex]);
+            const name = buildPageFilename(document.baseName, `page_${pageIndex + 1}`);
+            zip.file(name, out);
+          }),
+        );
+        const blob = await zip.generateAsync({ type: "blob" });
+        downloadBlob(blob, `${document.baseName || "split"}_pages.zip`);
+        return;
+      }
+
       const normalized = ranges.filter((r) => r.from >= 1 && r.to <= document.pageCount && r.from <= r.to);
       if (!normalized.length) {
         throw new Error("Add at least one valid page range.");
@@ -220,11 +268,51 @@ export function SplitRangeWorkspace() {
       <div className="grid gap-0 overflow-hidden rounded-xl border border-border bg-white dark:border-gray-700 dark:bg-gray-900 lg:grid-cols-[minmax(0,1fr)_360px]">
         {/* Preview canvas (wide light area) */}
         <section className="bg-gray-50 p-6 dark:bg-[#0b1020]">
-          <div className="space-y-8">
-            {ranges.map((r, idx) => (
-              <RangePreview key={r.id} pdfBytes={document.bytes} range={r} label={`Range ${idx + 1}`} />
-            ))}
-          </div>
+          {tab === "range" ? (
+            <div className="space-y-8">
+              {ranges.map((r, idx) => (
+                <RangePreview key={r.id} pdfBytes={document.bytes} range={r} label={`Range ${idx + 1}`} />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">Select pages</p>
+                {extractMode === "select" ? (
+                  <button
+                    type="button"
+                    className="text-xs font-medium text-gray-700 hover:underline dark:text-gray-300"
+                    onClick={() => setSelectedPages(new Set())}
+                  >
+                    Clear
+                  </button>
+                ) : null}
+              </div>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3">
+                {Array.from({ length: document.pageCount }, (_, pageIndex) => (
+                  <PageThumbnail
+                    key={pageIndex}
+                    pdfBytes={document.bytes}
+                    pageIndex={pageIndex}
+                    width={170}
+                    compact
+                    selected={selectedPages.has(pageIndex)}
+                    onClick={
+                      extractMode === "select"
+                        ? () =>
+                            setSelectedPages((cur) => {
+                              const next = new Set(cur);
+                              if (next.has(pageIndex)) next.delete(pageIndex);
+                              else next.add(pageIndex);
+                              return next;
+                            })
+                        : undefined
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Right sidebar */}
@@ -234,35 +322,107 @@ export function SplitRangeWorkspace() {
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">Range mode:</p>
             <div className="flex rounded-lg border border-border bg-white p-1 dark:border-gray-700 dark:bg-gray-900">
               <button
                 type="button"
                 className={
-                  mode === "custom"
+                  tab === "range"
                     ? "flex-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white"
                     : "flex-1 rounded-md px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
                 }
-                onClick={() => setMode("custom")}
+                onClick={() => setTab("range")}
               >
-                Custom
+                Range
               </button>
               <button
                 type="button"
                 className={
-                  mode === "fixed"
+                  tab === "pages"
                     ? "flex-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white"
                     : "flex-1 rounded-md px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
                 }
-                onClick={() => setMode("fixed")}
+                onClick={() => setTab("pages")}
               >
-                Fixed
+                Pages
               </button>
             </div>
           </div>
 
-          {mode === "custom" ? (
+          {tab === "pages" ? (
             <div className="space-y-4">
+              <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">Extract mode:</p>
+              <div className="flex rounded-lg border border-border bg-white p-1 dark:border-gray-700 dark:bg-gray-900">
+                <button
+                  type="button"
+                  className={
+                    extractMode === "all"
+                      ? "flex-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white"
+                      : "flex-1 rounded-md px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                  }
+                  onClick={() => {
+                    setExtractMode("all");
+                    setSelectedPages(new Set());
+                  }}
+                >
+                  Extract all pages
+                </button>
+                <button
+                  type="button"
+                  className={
+                    extractMode === "select"
+                      ? "flex-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white"
+                      : "flex-1 rounded-md px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                  }
+                  onClick={() => setExtractMode("select")}
+                >
+                  Select pages
+                </button>
+              </div>
+              {pagesSummary ? (
+                <div className="rounded-lg border border-border bg-blue-50 px-3 py-2 text-xs text-blue-800 dark:border-gray-700 dark:bg-blue-500/10 dark:text-blue-200">
+                  {pagesSummary}
+                </div>
+              ) : null}
+              {extractMode === "select" ? (
+                <div className="text-xs text-gray-600 dark:text-gray-400">
+                  Click thumbnails on the left to select pages.
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {tab === "range" ? (
+            <div className="space-y-5">
+              <div className="space-y-3">
+                <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">Range mode:</p>
+                <div className="flex rounded-lg border border-border bg-white p-1 dark:border-gray-700 dark:bg-gray-900">
+                  <button
+                    type="button"
+                    className={
+                      mode === "custom"
+                        ? "flex-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white"
+                        : "flex-1 rounded-md px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                    }
+                    onClick={() => setMode("custom")}
+                  >
+                    Custom
+                  </button>
+                  <button
+                    type="button"
+                    className={
+                      mode === "fixed"
+                        ? "flex-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white"
+                        : "flex-1 rounded-md px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                    }
+                    onClick={() => setMode("fixed")}
+                  >
+                    Fixed
+                  </button>
+                </div>
+              </div>
+
+              {mode === "custom" ? (
+                <div className="space-y-4">
               {customRanges.map((r, idx) => (
                 <div key={r.id} className="rounded-lg border border-border p-3 dark:border-gray-700 space-y-3">
                   <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">
@@ -332,36 +492,38 @@ export function SplitRangeWorkspace() {
                 />
                 <span>Merge all ranges in one PDF file</span>
               </label>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <label className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
-                <span>Split into page ranges of:</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={totalPages || 9999}
-                  value={fixedSize}
-                  onChange={(e) => setFixedSize(Number(e.target.value))}
-                  className="field-input"
-                />
-              </label>
-              {fixedSummary ? (
-                <div className="rounded-lg border border-border bg-blue-50 px-3 py-2 text-xs text-blue-800 dark:border-gray-700 dark:bg-blue-500/10 dark:text-blue-200">
-                  {fixedSummary}
                 </div>
-              ) : null}
-              <label className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
-                <input
-                  type="checkbox"
-                  checked={mergeAll}
-                  onChange={(e) => setMergeAll(e.target.checked)}
-                  className="mt-1"
-                />
-                <span>Merge all ranges in one PDF file</span>
-              </label>
+              ) : (
+                <div className="space-y-4">
+                  <label className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
+                    <span>Split into page ranges of:</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={totalPages || 9999}
+                      value={fixedSize}
+                      onChange={(e) => setFixedSize(Number(e.target.value))}
+                      className="field-input"
+                    />
+                  </label>
+                  {fixedSummary ? (
+                    <div className="rounded-lg border border-border bg-blue-50 px-3 py-2 text-xs text-blue-800 dark:border-gray-700 dark:bg-blue-500/10 dark:text-blue-200">
+                      {fixedSummary}
+                    </div>
+                  ) : null}
+                  <label className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <input
+                      type="checkbox"
+                      checked={mergeAll}
+                      onChange={(e) => setMergeAll(e.target.checked)}
+                      className="mt-1"
+                    />
+                    <span>Merge all ranges in one PDF file</span>
+                  </label>
+                </div>
+              )}
             </div>
-          )}
+          ) : null}
 
           <div className="pt-2">
             <button
