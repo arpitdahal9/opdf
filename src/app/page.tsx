@@ -11,6 +11,7 @@ import {
   QrCode,
   RotateCw,
   ScanText,
+  Shield,
   Shrink,
   Scissors,
   Workflow,
@@ -122,6 +123,13 @@ const tools = [
     description: "Draw a signature and stamp it onto every page of a PDF.",
     icon: PenLine,
     accent: "red" as const,
+  },
+  {
+    href: "/redact-pdf",
+    title: "Redact PDF",
+    description: "Permanently black out sensitive text and areas in your PDF.",
+    icon: Shield,
+    accent: "blue" as const,
   },
   {
     href: "/tools/pdf-page-counter",

@@ -12,6 +12,7 @@ import {
   Menu,
   Minimize2,
   PenLine,
+  Shield,
   type LucideIcon,
   RotateCw,
   Scissors,
@@ -26,7 +27,7 @@ import { useEffect, useState } from "react";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/language";
 
-const redLinkHrefs = new Set(["/split", "/reorder", "/pdf-to-word", "/compress"]);
+const redLinkHrefs = new Set(["/split", "/reorder", "/pdf-to-word", "/compress", "/redact-pdf"]);
 const blueLinkHrefs = new Set([
   "/merge",
   "/rotate",
@@ -46,6 +47,7 @@ const pdfTools: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/reorder", label: "Reorder PDF", icon: ArrowUpDown },
   { href: "/compress", label: "Compress PDF", icon: Minimize2 },
   { href: "/sign-pdf", label: "Sign PDF", icon: PenLine },
+  { href: "/redact-pdf", label: "Redact PDF", icon: Shield },
 ];
 
 const pdfConverter: { href: string; label: string; icon: LucideIcon }[] = [

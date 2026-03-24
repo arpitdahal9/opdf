@@ -10,6 +10,7 @@ import {
   PenLine,
   QrCode,
   ScanText,
+  Shield,
   RotateCw,
   Scissors,
   type LucideIcon,
@@ -39,6 +40,7 @@ const toolIcons: Record<string, LucideIcon> = {
   reorder: Move,
   compress: Minimize2,
   "sign-pdf": PenLine,
+  "redact-pdf": Shield,
 };
 
 const conversionIcons: Record<string, LucideIcon> = {

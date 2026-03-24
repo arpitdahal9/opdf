@@ -55,6 +55,12 @@ export const allTools: ToolItem[] = [
     name: "Sign PDF",
     description: "Draw and apply a signature to every page of a PDF.",
   },
+  {
+    slug: "redact-pdf",
+    path: "/redact-pdf",
+    name: "Redact PDF",
+    description: "Permanently black out sensitive text and areas in your PDF.",
+  },
 ];
 
 export const allConversions: ConversionItem[] = [
